@@ -152,11 +152,13 @@ public class Histogram {
 			PrintWriter writer = null;
 			AccessPoint ap = null;
 			int [] level_frequency = null;
+			File file = null;
+			String filename = null;
 			
 			for(int i = 0; i < aps.size(); i++) {
 				
 				// Create new directory for each cell
-				File file = new File(
+				file = new File(
 						cell.getParent()+
 						"/histogram/"+
 						cell.getName().substring(0,(cell.getName().length()-4)) // extract the name of the file without the .txt extension
@@ -171,7 +173,7 @@ public class Histogram {
 				}
 				
 				// Generate a new filename combining the SSID and BSSID of the accesspoint, such that this filename is unique
-				String filename = aps.get(i).getSSID()+
+				filename = aps.get(i).getSSID()+
 						"_"+
 						aps.get(i).getBSSID().replace(':', '_'); // replace the colons (:) with underscore (_), otherwise the filesystem will reject it
 				
@@ -189,7 +191,12 @@ public class Histogram {
 				level_frequency = ap.getLevelFrequencyAsArray();
 				
 				for(int j = 0; j < level_frequency.length; j += 2) {
-					writer.append(level_frequency[j] +","+level_frequency[j+1]+"\n");
+					writer.append(
+							level_frequency[j] +","+
+							level_frequency[j+1] +","+
+							(float)level_frequency[j+1]/ap.getTotalLevelFrequency()+
+							"\n"
+							);
 				}
 				writer.close();
 			}

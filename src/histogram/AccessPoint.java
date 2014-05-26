@@ -14,7 +14,12 @@ public class AccessPoint {
 	private int frequency = -1;
 	private String capabilities = "";
 	private int describeContents = -1;
+	
+	// Total amount of counted level (rssi) values
+	private int total_level_frequency = 0;
+	
 	private TreeMap<Integer, Integer> level_frequency = new TreeMap<Integer, Integer>();
+//	private TreeMap<Integer, Float> level_pdf = new TreeMap<Integer, Float>();
 	
 	
 	public AccessPoint(String ssid, String bssid, int level) {
@@ -96,9 +101,7 @@ public class AccessPoint {
 			// Then, we increase this value by one
 			i++;
 			
-			if(i > 274 )
-				System.out.println("i: "+i);
-			
+						
 			// At last, we want to save this new value back in the treemap with its corresponding level, i.e. key
 			// Since, the function put() only accepts objects and not primitive values we must transform the key and the value to 
 			// their object representation with Integer.valueof()
@@ -110,5 +113,16 @@ public class AccessPoint {
 			// corresponding frequency value of 1. (Since it is the first time that this level appears)
 			level_frequency.put(Integer.valueOf(level), Integer.valueOf(1));
 		}
+		
+		// The total number of occurred levels is increase by one
+		total_level_frequency++;
+	}
+	
+	
+	/*
+	 * This function returns the total amount of all occurred levels (rssi)
+	 */
+	public int getTotalLevelFrequency() {
+		return total_level_frequency;
 	}
 }
