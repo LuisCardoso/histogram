@@ -2,11 +2,11 @@ package histogram;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Scanner;
+
+import filter.AccessPointOccurrence;
 
 public class Histogram {
 	
@@ -79,10 +79,10 @@ public class Histogram {
 					
 				}
 				
-				if(!debug.equalsIgnoreCase(debug_p) && debug_i <= 100) {
-					System.out.println("SampleId: "+debug);
-					debug_p = debug;
-				}
+//				if(!debug.equalsIgnoreCase(debug_p) && debug_i <= 100) {
+//					System.out.println("SampleId: "+debug);
+//					debug_p = debug;
+//				}
 				
 				// If the accesspoint does not exist in the arraylist
 				// then create a new accesspoint in put it in the arraylist
@@ -177,6 +177,7 @@ public class Histogram {
 						"_"+
 						aps.get(i).getBSSID().replace(':', '_'); // replace the colons (:) with underscore (_), otherwise the filesystem will reject it
 				
+				
 				// Creates a new file in its corresponding directory
 				writer = new PrintWriter(
 						file.getPath()+
@@ -199,6 +200,76 @@ public class Histogram {
 							);
 				}
 				writer.close();
+			}
+			
+		}
+		catch(FileNotFoundException fnfe) {
+			System.out.println("\n\nFile not found: \n\n"+ fnfe.getMessage());
+		}
+		catch(SecurityException se) {
+			System.out.println("\n\nSecurity: \n\n"+ se.getMessage());
+		}	
+	}
+	
+	
+	/*
+	 * This writes the generated histogram to a file
+	 */
+	public void writeHistogramToFile(AccessPointOccurrence occur) {
+		try {
+			PrintWriter writer = null;
+			AccessPoint ap = null;
+			int [] level_frequency = null;
+			File file = null;
+			String filename = null;
+			
+			for(int i = 0; i < aps.size(); i++) {
+				
+				// Create new directory for each cell
+				file = new File(
+						cell.getParent()+
+						"/histogram/"+
+						cell.getName().substring(0,(cell.getName().length()-4)) // extract the name of the file without the .txt extension
+						);
+				
+				// If the directory does not exist, then make one
+				if(!file.exists()) {
+					if(file.mkdirs())
+						System.out.println("Directory created!");
+					else
+						System.out.println("Failed to create directory!");
+				}
+				
+				// Generate a new filename combining the SSID and BSSID of the accesspoint, such that this filename is unique
+				filename = aps.get(i).getSSID()+
+						"_"+
+						aps.get(i).getBSSID().replace(':', '_'); // replace the colons (:) with underscore (_), otherwise the filesystem will reject it
+				
+				
+				// Creates a new file in its corresponding directory
+				writer = new PrintWriter(
+						file.getPath()+
+						"/"+filename+
+						".txt"
+						);
+				
+				// get the ith accesspoint in the arraylist
+				ap = aps.get(i);
+				
+				// get the frequency of occurrence of each level for this accesspoint
+				level_frequency = ap.getLevelFrequencyAsArray();
+				
+				for(int j = 0; j < level_frequency.length; j += 2) {
+					writer.append(
+							level_frequency[j] +","+
+							level_frequency[j+1] +","+
+							(float)level_frequency[j+1]/ap.getTotalLevelFrequency()+
+							"\n"
+							);
+				}
+				writer.close();
+				
+				occur.increaseOccurrenceOf(filename);
 			}
 			
 		}
