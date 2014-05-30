@@ -11,8 +11,8 @@ import filter.AccessPointOccurrence;
 public class Main {
 
 	public static void main(String[] args) {
-//		Histogram histogram = null;
-//		AccessPointOccurrence occurrency = new AccessPointOccurrence();
+		Histogram histogram = null;
+		AccessPointOccurrence occurrency = new AccessPointOccurrence();
 		
 		String filepath = "/home/luis/Dropbox/School/Elective/Smart Phones Sensing/Doc/cellsdata/26May2014/Night";
 		
@@ -22,24 +22,24 @@ public class Main {
 		Path dir = Paths.get(filepath);
 //		
 		try (DirectoryStream<Path> stream = Files.newDirectoryStream(dir)) {
-//			
-//			
-//			for(Path file : stream) {
-//				if(file.getFileName().toString().startsWith("c", 0) && 
-//						file.getFileName().toString().endsWith(".txt")) {
-//					
-//					
-//					
-//					histogram = new Histogram();
-//					histogram.generateHistogram(file.toFile());
-//					histogram.writeHistogramToFile(occurrency);
-//				}
-//				
-//				
-//			} // for(Path file : stream)
-//			
-//			// Write occurrence of each access-point to a file
-//			occurrency.writeOccurrenceToFile(filepath);
+			
+			
+			for(Path file : stream) {
+				if(file.getFileName().toString().startsWith("c", 0) && 
+						file.getFileName().toString().endsWith(".txt")) {
+					
+					
+					
+					histogram = new Histogram();
+					histogram.generateHistogram(file.toFile());
+					histogram.writeHistogramToFile(occurrency);
+				}
+				
+				
+			} // for(Path file : stream)
+			
+			// Write occurrence of each access-point to a file
+			occurrency.writeOccurrenceToFile(filepath);
 			
 			// Compute overall average
 			selAvg.computeTotalAverage();
