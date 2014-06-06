@@ -74,7 +74,7 @@ public class Main {
 		
 		
 	    //initiate classifier
-		Bayesian Bclassifier = new Bayesian(ap1_pmf,ap2_pmf, ap3_pmf, ap4_pmf);
+		Bclassifier = new Bayesian(ap1_pmf,ap2_pmf, ap3_pmf, ap4_pmf);
 	    
 		//begin classification
 		Bclassifier.bayesian_classify(false);
