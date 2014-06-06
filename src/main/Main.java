@@ -20,7 +20,7 @@ public class Main {
 
 	public static void main(String[] args) {
 		
-		int User=1;  //0 = Javier pc, 1=Luis pc, 2=all phones,
+		int User=0;  //0 = Javier pc, 1=Luis pc, 2=all phones,
 		
 		
 		String folder_base_path = null;
@@ -206,23 +206,7 @@ public class Main {
 	    
 	    
 	    keyboard.close();
-	    
-	    
-	    
-	    
-		    
-	    
-	    
-	    
-	    
-	    
-	    
-	    
-	    
-	    
-	    
-	    
-	    
+	       
 	    
 	    
 	    
