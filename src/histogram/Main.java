@@ -102,7 +102,11 @@ public class Main {
 	 
 	    //read the accesspoints
 		
-		//step 7: Create PMF table for each chosen Access Point
+		
+	    
+	    
+	    
+	    //step 7: Create PMF table for each chosen Access Point
 		
 	
 		/* *********************************************
