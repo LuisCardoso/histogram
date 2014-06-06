@@ -7,6 +7,7 @@ import java.nio.file.Paths;
 
 import accesspoint.selection.SelectionAverage;
 import filter.AccessPointOccurrence;
+import filter.AccessPointRSSIStrength;
 
 public class Main {
 
@@ -15,7 +16,8 @@ public class Main {
 		AccessPointOccurrence occurrency = new AccessPointOccurrence();
 		
 		String filepath = "/home/luis/Dropbox/School/Elective/Smart Phones Sensing/Doc/cellsdata/26May2014/Night";
-		
+		//AccessPointRSSIStrength rssi_filter = new AccessPointRSSIStrength(filepath);
+			
 		SelectionAverage selAvg = new SelectionAverage(filepath);
 		
 		
