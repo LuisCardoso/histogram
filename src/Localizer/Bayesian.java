@@ -1,8 +1,9 @@
 package Localizer;
 
-import java.lang.reflect.Array;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Scanner;
 
 public class Bayesian {
      
@@ -378,6 +379,85 @@ public class Bayesian {
     		System.out.println(" ["+i + "]: "+ data[i]);
     	}
     }
+    
+    
+/*This function takes the path of the PMF file of a given access point,
+ * and returns it as a 2D array */    
+	static public float [][] fetch_pmf(String filename_path)
+	{
+		
+		String [][] array = new String [17+1][100+1] ;
+		float [][] array_float = new float [17+1][100] ;
+		
+	//	Table table = new Table("TestTable");
+		int r=0,c=0;
+		
+		try{
+			File file = new File(filename_path);
+		
+		
+			Scanner lineScanner= new Scanner(file);
+	
+			int file_id= 1;
+			
+	//		Table PMF_AP = new Table("fileid " +file_id++);
+			
+			// The values are comma separated
+			lineScanner.useDelimiter("\\s*[,\n\r]\\s*");
+			
+			
+			// Iterate over each token
+			while(lineScanner.hasNextLine()) {
+				
+				String line =lineScanner.nextLine();
+				
+				Scanner textScanner = new Scanner(line);
+				textScanner.useDelimiter("\\s*[,\n\r]\\s*");
+			
+				
+				while(textScanner.hasNext())
+				{
+				
+					String token = textScanner.next();
+					array[r][c] = token;
+					
+					if(c!=0)
+					{
+						array_float[r][c-1]= Float.valueOf(token).floatValue(); 
+					}
+					
+					
+					c++;
+				}
+				
+				textScanner.close();
+				c=0;
+				r++;
+
+			} 
+			
+			lineScanner.close();
+			r=0;
+			}
+			catch(FileNotFoundException e){
+				System.out.println(" File not found"+e.getMessage());
+			}
+			
+			return array_float;	
+	}
+	
+	
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
 
 }
