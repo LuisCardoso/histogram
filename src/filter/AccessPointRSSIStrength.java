@@ -59,13 +59,13 @@ public class AccessPointRSSIStrength {
 		 	Map.Entry me;	
 		  	Object[] objectArrayOfValues = data.values().toArray();
 		 	
-		 	for(int k=0; k<objectArrayOfValues.length; k++){
-		 		temp[k]= (Float)objectArrayOfValues[k];
+		 	for(int k=0; k<objectArrayOfValues.length; k++){ // !!! Does not need. Pass objectArrayOfValues to get_mean !!!
+		 		temp[k]= (Float)objectArrayOfValues[k]; 
 			 }		
 
 		 	/* calculate the mean and std of all the key */
 		 	total_avg = get_mean(temp);
-		 	total_std = get_standardDeviation(temp,total_avg);
+		 	total_std = get_standardDeviation(temp,total_avg);  // !!! total_avg is global, no need to pass it to a function !!!
 		 	threshold_tooStrong = total_avg+total_std;
 			threshold_tooWeak = total_avg-total_std;
 			   
