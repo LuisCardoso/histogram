@@ -303,5 +303,20 @@ public class Main {
 		
 		
 	}
+	
+	public ArrayList<String> chooseNewAccessPoints()
+	{
+		//show list of all filtered access-points
+		
+		//show list of previously access-points
+		
+		//read new chosen access-points
+		
+		
+		//return chosen access-points
+		return null;
+	}
+	
+	
 
 }
