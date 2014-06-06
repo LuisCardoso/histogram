@@ -118,7 +118,7 @@ public class Main {
 	    // Selected access-point names by the user
 	    ArrayList<String> names = new ArrayList<String>();
 	    names.add("Conferentie-TUD_00_1b_90_76_d3_f6");
-	    names.add("");
+	    names.add("eduroam_00_1b_90_76_d3_f0");
 	    
 	    // new trainingdata
 	    TrainingData td;
@@ -135,6 +135,8 @@ public class Main {
 	      
 	     	 	td.createPMFTable();
 	      		td.createHistogramTable();
+	      		
+	      		tds.add(td);
 	      }
 	     
 	    
