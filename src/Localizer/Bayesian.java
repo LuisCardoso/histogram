@@ -6,7 +6,10 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Bayesian {
-     
+	String folder_name="3_Chosen_AP/2_PMF_AccessPoints_allCells/";
+	String filepath="";
+	
+	
 	static int numberOfCells = 17;
 	static int numberOfObservations = 4;
 	static int RSSI_Range = 100;
@@ -23,7 +26,6 @@ public class Bayesian {
 	//List of the PMF of the training data
 	//static ArrayList<Table> PMF_TrainingDataSet = new ArrayList<Table>();
 	
-	
 	//static float [][] PM = new float [numberOfCells] [numberOfObservations];
    	public ArrayList<Float[][]> TrainingData_PMF = new ArrayList<Float[][]>();
 	
@@ -34,10 +36,16 @@ public class Bayesian {
 	static public float [][]ap4_pmf ;
 	
 	
+	public Bayesian()
+	{
+		
+	}
+	
 	/* Constructor which takes in the PMF distributions of the  four chosen Access Points  */
     public  Bayesian(float [][]ap1_pmf,float [][]ap2_pmf,float [][]ap3_pmf,float [][]ap4_pmf ){
    
-    	 //2d array copies well
+    	this.filepath=filepath;
+    	
     	this.ap1_pmf=ap1_pmf;
         this.ap2_pmf=ap2_pmf;
         this.ap3_pmf=ap3_pmf;
@@ -88,30 +96,14 @@ public class Bayesian {
         temp3_pmf=ap3_pmf;
         temp4_pmf=ap4_pmf;
         
+    	//eduroam / confer / tudelft /  TUvistor
         
-    	observations[0] = -74;
+    	observations[0] = -74; 
     	observations[1] = -73;
     	observations[2] = -83;
     	observations[3] = -72;
 
             	
-    	//eduroam / confer / tudelft /  TUvistor
-    	/*observations[0] = -73;
-    	observations[1] = -69;
-    	observations[2] = -78;
-    	observations[3] = -72;
-
-    	observations[0] = -75;
-    	observations[1] = -76;
-    	observations[2] = -83;
-    	observations[3] = -76;
-
-    	observations[0] = -60;
-    	observations[1] = -67;
-    	observations[2] = -56;
-    	observations[3] = -37;
-
-*/
         /* correct 0 conditional probability for a given cell and access point if
 	    	 * Send all PMF to the Laplace filter
 	    	 * */
@@ -386,7 +378,7 @@ public class Bayesian {
 	static public float [][] fetch_pmf(String filename_path)
 	{
 		
-		String [][] array = new String [17+1][100+1] ;
+		//String [][] array = new String [17+1][100+1] ;
 		float [][] array_float = new float [17+1][100] ;
 		
 	//	Table table = new Table("TestTable");
@@ -419,7 +411,7 @@ public class Bayesian {
 				{
 				
 					String token = textScanner.next();
-					array[r][c] = token;
+			//		array[r][c] = token;
 					
 					if(c!=0)
 					{

@@ -48,9 +48,11 @@ public class AccessPointOccurrence {
 	public void writeOccurrenceToFile(String filepath) {
 		
 		try {
+			String folder_name = "1_RawUnselected_AP/occurrence/";
 			String filename = "occurrence.txt";
 			
-			File file = new File(filepath+"/occurrence");
+			//File file = new File(filepath+"/occurrence");
+			File file = new File(filepath+folder_name);
 			
 			
 			// If the directory does not exist, then make one

@@ -34,7 +34,9 @@ public class SelectionAverage {
 	public void computeTotalAverage() {
 		try {
 			// Read in the cell file
-			String selection = filepath+"/selection/selection.txt";
+			String folder_name="2_Filter/selection/";
+			//String selection = filepath+"/selection/selection.txt";
+			String selection = filepath+folder_name+"selection.txt";
 			
 			File file = new File(selection);
 			
@@ -84,7 +86,9 @@ public class SelectionAverage {
 		float pmf = 0;
 		
 		// Fetch the main dir
-		Path dir = Paths.get(filepath+"/histogram");
+		//Path dir = Paths.get(filepath+"/histogram");
+		Path dir = Paths.get(filepath+"1_RawUnselected_AP/histogram/");
+		
 		String filename;
 		
 		try (DirectoryStream<Path> dirs = Files.newDirectoryStream(dir)) {
@@ -156,8 +160,13 @@ public class SelectionAverage {
 	public void writeOverallAverageToFile() {
 		try {
 			String filename = "selectionAvg.txt";
+			String folder_name="2_Filter/selection/";		
 			
-			File file = new File(filepath+"/selection");
+		
+			File file = new File(filepath+folder_name);
+		//	File file = new File(filepath+"/selection");
+			//String folder_name="2_Filter/selection/";
+			//File file = new File(filepath+folder_name);
 			
 			
 			// If the directory does not exist, then make one
