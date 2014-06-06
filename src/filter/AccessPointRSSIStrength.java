@@ -248,14 +248,19 @@ public class AccessPointRSSIStrength {
 	
 	public void display_normalAP()
 	{
+		System.out.println("filtered Access-Points");
 		
-		for(int i=0; i<filtered_ap.size(); i++)		
+		for(int i=0; i<filtered_ap.size(); i++)	
 		{
-			System.out.println("filter AP: "+ filtered_ap.get(i));//
+			System.out.println("[" + (i+1) + "]: " +filtered_ap.get(i));//
 		}
 		
 	}
 	
+	public ArrayList<String> get_list_of_normalAP()
+	{
+		return filtered_ap;
+	}
 	
 	
 	
