@@ -1,4 +1,4 @@
-package test;
+package Localizer;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -18,8 +18,7 @@ public class Bayesian {
 	
 	static int callcount = 0;
 	static float [][][] TrainingData; // per access point hold their histogram. [Access point ID][Cell ID][RSSI value]
-	
-	
+
 	//List of the PMF of the training data
 	//static ArrayList<Table> PMF_TrainingDataSet = new ArrayList<Table>();
 	
