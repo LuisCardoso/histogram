@@ -168,7 +168,7 @@ public class TrainingData {
 		    	
 		    	
 		    	table.setValue(
-		    			Integer.parseInt(cell.substring(1))-1, 
+		    			Integer.parseInt(cell)-1, 
 		    			Math.abs(Integer.parseInt(tokens[0])), 
 		    			Float.parseFloat(tokens[2]));
 		    	

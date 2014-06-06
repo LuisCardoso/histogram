@@ -217,8 +217,10 @@ public class Main {
 	    
 	    // Selected access-point names by the user
 	    ArrayList<String> names = new ArrayList<String>();
-	    names.add("Conferentie-TUD_00_1b_90_76_d3_f6");
-	    names.add("eduroam_00_1b_90_76_d3_f0");
+	//    names.add("Conferentie-TUD_00_1b_90_76_d3_f6");
+	  //  names.add("eduroam_00_1b_90_76_d3_f0");
+	    
+	    names = chosen_ap_names;
 	    
 	    // new trainingdata
 	    TrainingData td;

@@ -56,7 +56,7 @@ public class Table {
 			for(int j = 0; j < table[i].length; j++) {
 				if(table[i][j] > 0) {
 	//				Log.d("TableValue", ""+"i:" +i+1+ " j:"+ j +" = "+ pmf[i][j]);
-					System.out.println("TableValue"+ ""+"i:" +i+1+ " j:"+ j +" = "+ table[i][j]);
+					System.out.println("TableValue [i:"+ (i+1)+ "]  " + "[j:"+ j +"] = "+ table[i][j]);
 				}
 			}
 		}
