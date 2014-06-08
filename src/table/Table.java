@@ -11,7 +11,7 @@ public class Table {
 	private String name;
 	
 	// pmf table: row (cell) ranges from 1 to 17 and column (rssi) ranges from 0 to 100
-	private float [][] table = new float[17][100];
+	private Float [][] table = new Float[17][101];
 	
 	
 	/*
@@ -34,7 +34,7 @@ public class Table {
 	 * Set the pmf of this table at a given row (cell) and column (rssi)
 	 */
 	public void setValue(int cell, int rssi, float pmf) {
-		this.table[cell][rssi] = pmf;
+		this.table[cell][rssi] = new Float(pmf);
 	}
 	
 	
@@ -42,7 +42,15 @@ public class Table {
 	 * Returns the pmf of this table at a given row (cell) and column (rssi)
 	 */
 	public float getValue(int cell, int rssi) {
-		return this.table[cell][rssi];
+		return this.table[cell][rssi].floatValue();
+	}
+	
+	
+	/*
+	 * Returns the table
+	 */
+	public Float[][] getTable() {
+		return table;
 	}
 		
 	
@@ -51,10 +59,10 @@ public class Table {
 	 */
 	public void printTable() {
 	//	Log.d("TableName", name);
-		System.out.println("TableName"+ name);
+		System.out.println("TableName: "+ name);
 		for(int i = 0; i < table.length; i++) {
 			for(int j = 0; j < table[i].length; j++) {
-				if(table[i][j] > 0) {
+				if((table[i][j] != null) && ((table[i][j]).floatValue() > 0)) {
 	//				Log.d("TableValue", ""+"i:" +i+1+ " j:"+ j +" = "+ pmf[i][j]);
 					System.out.println("TableValue [i:"+ (i+1)+ "]  " + "[j:"+ j +"] = "+ table[i][j]);
 				}

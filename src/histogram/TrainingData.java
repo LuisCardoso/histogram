@@ -75,6 +75,7 @@ public class TrainingData {
 		// cell name
 		String cell = "";
 		String tokens[] = null;
+		String filename = "";
 		
 		// table name
 //		String accesspoint = "";
@@ -101,28 +102,36 @@ public class TrainingData {
 		    
 		    // Iterate over each file
 		    for(File f : file) {
-//		    	Log.d("File", "\t FileName:" +f.getName());
 		    	
-		    	// retrieving the cell name (directory name) from the parent path
-		    	// by removing (trimming) the path of the directory
-		    	tokens = f.getParent().split("/"); // ????????????????????? path changed ???????????????????????????
+		    	// filename without extension .txt
+		    	filename = (f.getName().substring(0, f.getName().length()-4)); 
 		    	
-		    	 cell = tokens[tokens.length-1].substring(1);
-		    	 
-		    	// retrieving the name of the access-point from the filename
-//		    	accesspoint = f.getName().substring(0, f.getName().length()-4);
-//		    	Log.d("Accesspoint", accesspoint);
-		    	
-		    	// Fetch the table with the cell name
-//		    	table = getTable(accesspoint);
-		    	
-		    	// Creates a new table if it does not exist yet
-		    	if(pmfTable == null) {
-		    		pmfTable = new Table(access_point_name);
+		    	// Only process the file that corresponds to the access-point name
+		    	if(filename.equalsIgnoreCase(access_point_name)) {
+		    		// retrieving the cell name (directory name) from the parent path
+			    	// by removing (trimming) the path of the directory
+			    	tokens = f.getParent().split("/");
+			    	
+			    	 cell = tokens[tokens.length-1].substring(1);
+			    	 
+			    	// retrieving the name of the access-point from the filename
+//			    	accesspoint = f.getName().substring(0, f.getName().length()-4);
+//			    	Log.d("Accesspoint", accesspoint);
+			    	
+			    	// Fetch the table with the cell name
+//			    	table = getTable(accesspoint);
+			    	
+			    	// Creates a new table if it does not exist yet
+			    	if(pmfTable == null) {
+			    		pmfTable = new Table(access_point_name);
+			    	}
+			    	
+			    	// Read file
+			    	putPMFIntoTable(f, pmfTable, cell);
+			    	
+			    	break;
 		    	}
 		    	
-		    	// Read file
-		    	putPMFIntoTable(f, pmfTable, cell);
 		    }
 		}
 	}
@@ -172,7 +181,7 @@ public class TrainingData {
 		    			Math.abs(Integer.parseInt(tokens[0])), 
 		    			Float.parseFloat(tokens[2]));
 		    	
-		    	table.printTable();
+//		    	table.printTable();
 		    }
 		    
 //		    Log.d("ReadFile", text.toString());
@@ -206,6 +215,7 @@ public class TrainingData {
 		// cell name
 		String cell = "";
 		String tokens[] = null;
+		String filename = "";
 		
 		// table name
 //		String accesspoint = "";
@@ -232,28 +242,36 @@ public class TrainingData {
 		    
 		    // Iterate over each file
 		    for(File f : file) {
-//		    	Log.d("File", "\t FileName:" +f.getName());
 		    	
-		    	// retrieving the cell name (directory name) from the parent path
-		    	// by removing (trimming) the path of the directory
-		    	tokens = f.getParent().split("/"); // ????????????????????? path changed ???????????????????????????
+		    	// filename without extension .txt
+		    	filename = (f.getName().substring(0, f.getName().length()-4)); 
 		    	
-		    	 cell = tokens[tokens.length-1].substring(1);
-		    	
-		    	// retrieving the name of the access-point from the filename
-//		    	accesspoint = f.getName().substring(0, f.getName().length()-4);
-//		    	Log.d("Accesspoint", accesspoint);
-		    	
-		    	// Fetch the table with the cell name
-//		    	table = getTable(accesspoint);
-		    	
-		    	// Creates a new table if it does not exist yet
-		    	if(histogramTable == null) {
-		    		histogramTable = new Table(access_point_name);
+		    	// Only process the file that corresponds to the access-point name
+		    	if(filename.equalsIgnoreCase(access_point_name)) {
+		    		// retrieving the cell name (directory name) from the parent path
+			    	// by removing (trimming) the path of the directory
+			    	tokens = f.getParent().split("/"); // ????????????????????? path changed ???????????????????????????
+			    	
+			    	 cell = tokens[tokens.length-1].substring(1);
+			    	
+			    	// retrieving the name of the access-point from the filename
+//			    	accesspoint = f.getName().substring(0, f.getName().length()-4);
+//			    	Log.d("Accesspoint", accesspoint);
+			    	
+			    	// Fetch the table with the cell name
+//			    	table = getTable(accesspoint);
+			    	
+			    	// Creates a new table if it does not exist yet
+			    	if(histogramTable == null) {
+			    		histogramTable = new Table(access_point_name);
+			    	}
+			    	
+			    	// Read file
+			    	putHistogramIntoTable(f, histogramTable, cell);
+			    	
+			    	break;
 		    	}
 		    	
-		    	// Read file
-		    	putHistogramIntoTable(f, histogramTable, cell);
 		    }
 		}
 	}
@@ -279,11 +297,11 @@ public class TrainingData {
 //		    	Log.d("Cell-1", ""+(Integer.parseInt(cell.substring(1))-1));
 		    	
 		    	table.setValue(
-		    			Integer.parseInt(cell.substring(1))-1, 
+		    			Integer.parseInt(cell)-1, 
 		    			Math.abs(Integer.parseInt(tokens[0])), 
 		    			Float.parseFloat(tokens[1]));
 		    	
-		    	table.printTable();
+//		    	table.printTable();
 		    }
 		    
 //		    Log.d("ReadFile", text.toString());
