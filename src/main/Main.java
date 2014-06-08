@@ -3,7 +3,10 @@ package main;
 import filter.AccessPointOccurrence;
 import filter.AccessPointRSSIStrength;
 import filter.SelectionAverage;
+
 import filter.SelectionCoverage;
+import gui.DataTable;
+
 import histogram.Histogram;
 import histogram.TrainingData;
 
@@ -21,7 +24,7 @@ public class Main {
 
 	public static void main(String[] args) {
 		
-		int User=0;  //0 = Javier pc, 1=Luis pc, 2=all phones,
+		int User=1;  //0 = Javier pc, 1=Luis pc, 2=all phones,
 		
 		
 		String folder_base_path = null;
@@ -151,13 +154,13 @@ public class Main {
 	   
 	   //number position of access-point in filtered access-point array list
 	   int ap_number;
-	   
+	   Scanner id_scanner = null;
 	   //read each line from user input, each line is ended with pressing enter
 	   //for each line read the number
 	   //stop reading, when no id is given and enter is pressed
-	   while(  (data=keyboard.nextLine()).length() > 0)
+	   while((data=keyboard.nextLine()).length() > 0)
 	   {
-		   Scanner id_scanner = new Scanner(data); //read new line
+		   id_scanner = new Scanner(data); //read new line
 		
 		 //fetch number for that line. 
 		   //substract 1 since ap are displayed from 1 until X, instead from 0-X.
@@ -165,6 +168,8 @@ public class Main {
 		   
 		   chosen_ap.add(ap_number);
 	   }
+	   
+//	   id_scanner.close();
 	   
 	    System.out.println("number access points chosen:" + chosen_ap.size());
 	    System.out.println("Display of chosen access-points");
@@ -251,9 +256,12 @@ public class Main {
 	      		tds.add(td);
 	      }
 	     
+	      
+	      // Show training data in a table
+	      DataTable dt = new DataTable(tds);
+	      dt.showTables();
+//	      dt.showHistogramTable();
 	    
-	    
-//	    createPMFTable();
 	
 		/* *********************************************
 		 *  Phase 3: Apply Bayesian classification using the chosen Access points 
