@@ -82,7 +82,7 @@ public class DataTable {
 	private void createHistogramTable(String tableName) {
 		JTable table = new JTable(histogramTable, columnNames);
 		table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-		table.setPreferredScrollableViewportSize(new Dimension(700, 100));
+		table.setPreferredScrollableViewportSize(new Dimension(700, 300));
 		table.setFillsViewportHeight(true);
 		
 		// Put table in scrollpane, so that becomes scrollable 
@@ -104,7 +104,7 @@ public class DataTable {
 	private void createPMFTable(String tableName) {
 		JTable table = new JTable(pmfTable, columnNames);
 		table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-		table.setPreferredScrollableViewportSize(new Dimension(700, 100));
+		table.setPreferredScrollableViewportSize(new Dimension(700, 300));
 		table.setFillsViewportHeight(true);
 		
 		// Put table in scrollpane, so that becomes scrollable 
