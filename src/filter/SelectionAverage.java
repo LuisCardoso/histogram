@@ -36,7 +36,8 @@ public class SelectionAverage {
 			// Read in the cell file
 			String folder_name="2_Filter/selection/";
 			//String selection = filepath+"/selection/selection.txt";
-			String selection = filepath+folder_name+"selection.txt";
+			//String selection = filepath+folder_name+"selection.txt";
+			String selection = filepath+folder_name+"selectionCvg.txt";
 			
 			File file = new File(selection);
 			

@@ -3,6 +3,7 @@ package main;
 import filter.AccessPointOccurrence;
 import filter.AccessPointRSSIStrength;
 import filter.SelectionAverage;
+import filter.SelectionCoverage;
 import histogram.Histogram;
 import histogram.TrainingData;
 
@@ -25,19 +26,19 @@ public class Main {
 		
 		String folder_base_path = null;
 		
-		if(User==0)
-			folder_base_path = "/home/swifferayubu/Dropbox/Doc/";
+		if(User==0){
+			folder_base_path = "/home/swifferayubu/Dropbox/Test/";
+			//folder_base_path = "/home/swifferayubu/Dropbox/Doc/";
+		}
 		else if (User==1)
 			folder_base_path =	"/home/luis/Dropbox/School/Elective/Smart Phones Sensing/Doc/";
 		else if (User==2)
 			folder_base_path =	"/Downloads/";
 		
-		String folder_name = "cellsdata/";		//main folder
+		String root_folder_name = "cellsdata/";		//main folder
 	
-		String filepath= folder_base_path + folder_name;	
-		//String filepath = "/home/luis/Dropbox/School/Elective/Smart Phones Sensing/Doc/cellsdata/26May2014/Night";
-
-		
+		String filepath= folder_base_path + root_folder_name;	
+			
 		
 		/* *********************************************
 		 * Phase 1: Create Histogram and PMF for all Access points
@@ -46,11 +47,15 @@ public class Main {
 		Histogram histogram = null;
 		AccessPointOccurrence occurrency = new AccessPointOccurrence();
 		//AccessPointRSSIStrength rssi_filter = new AccessPointRSSIStrength(filepath);
-		
+	
+		int numberOfCells =17;
+		int coverage_percentage= 50;
+		SelectionCoverage selCvg = new SelectionCoverage(numberOfCells,coverage_percentage,filepath);
 		SelectionAverage selAvg = new SelectionAverage(filepath);
 				
-		
-		Path dir = Paths.get(filepath);
+		//fetch path to the Raw sampled data, saved in .txt format
+		String pathToRawData= "1_RawUnselected_AP/";
+		Path dir = Paths.get(filepath+pathToRawData);
 		
 		try (DirectoryStream<Path> stream = Files.newDirectoryStream(dir)) {
 			
@@ -74,10 +79,15 @@ public class Main {
 			
 			// Write occurrence of each access-point to a file
 			occurrency.writeOccurrenceToFile(filepath);
+		
+			// step 4: Filter by coverage, > 50%
+			//filter Access-Point by coverage and save results
+			selCvg.generateSelection();
+			selCvg.writeSelectionToFile();
 			
 			// Compute overall average
 			//todo: Can the percentage be given as parameter?
-			selAvg.computeTotalAverage(); // step 4: Filter by coverage, > 50%
+			selAvg.computeTotalAverage(); 
 			selAvg.writeOverallAverageToFile();
 			
 			
@@ -249,7 +259,7 @@ public class Main {
 		 *  Phase 3: Apply Bayesian classification using the chosen Access points 
 		 * ********************************************* */
 //		String pmf_filepath = "/home/swifferayubu/Dropbox/Doc/cellsdata/3_Chosen_AP/2_PMF_AccessPoints_allCells/";
-		folder_name="3_Chosen_AP/2_PMF_AccessPoints_allCells/";
+		String folder_name="3_Chosen_AP/2_PMF_AccessPoints_allCells/";
 		String pmf_filepath = filepath+folder_name;
 		
 		
