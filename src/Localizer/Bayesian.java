@@ -1,22 +1,33 @@
 package Localizer;
 
+import histogram.TrainingData;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Bayesian {
-	String folder_name="3_Chosen_AP/2_PMF_AccessPoints_allCells/";
+	//String folder_name="3_Chosen_AP/2_PMF_AccessPoints_allCells/";
 	String filepath="";
 	
 	
-	static int numberOfCells = 17;
+    // Set of trainingdata. Each trainingdata is associated to one access-point
+    ArrayList<TrainingData> tds = new ArrayList<TrainingData>();
+	
+    //keep track of all the classification results and correct answer, in order to calculate accuracy of this classifier
+//    ArrayList<String> listOfClassification = new ArrayList<String>();
+  //  ArrayList<String> listOfCorrectLocalization = new ArrayList<String>();
+    
+    
+    static int numberOfCells = 17;
 	static int numberOfObservations = 4;
 	static int RSSI_Range = 100;
 	
 	static boolean Laplace_Correction = false;
 	static String classifier_type = "";
 	
+	//information about classifier accuracy
 	static float error_percentage;
 	static float accuracy;
 	
@@ -36,13 +47,13 @@ public class Bayesian {
 	static public float [][]ap4_pmf ;
 	
 	
-	public Bayesian()
+	public Bayesian(String filepath)
 	{
-		
+		this.filepath=filepath;
 	}
 	
 	/* Constructor which takes in the PMF distributions of the  four chosen Access Points  */
-    public  Bayesian(float [][]ap1_pmf,float [][]ap2_pmf,float [][]ap3_pmf,float [][]ap4_pmf ){
+   /* public  Bayesian(float [][]ap1_pmf,float [][]ap2_pmf,float [][]ap3_pmf,float [][]ap4_pmf ){
    
     	this.filepath=filepath;
     	
@@ -51,8 +62,28 @@ public class Bayesian {
         this.ap3_pmf=ap3_pmf;
         this.ap4_pmf=ap4_pmf;
     }
-        
+    */   
     
+	
+	/*Train classifier, to know what PMF Table to use */
+	public void trainClassifier(ArrayList<TrainingData> trainingData)
+	{
+		this.tds = trainingData;
+		
+	}
+	
+	/*
+	 * This function takes in the new observation sample, and returns the classification type. 
+	 *   */
+
+	public String classifyObservation(ArrayList<Float> observations)
+	{
+	
+		return null;
+	}
+	
+	
+	/*
     public void create_trainingTable(float [][][] trainingdata){
     	
     	TrainingData = new float [numberOfObservations][numberOfCells][RSSI_Range];   	
@@ -71,7 +102,7 @@ public class Bayesian {
     {
     	this.numberOfObservations= Accesspoints_count;
     }
-
+*/
     
     public  String bayesian_classify(boolean use_laplace){
     	String bayesian_result=null;

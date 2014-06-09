@@ -24,7 +24,7 @@ public class Main {
 
 	public static void main(String[] args) {
 		
-		int User=1;  //0 = Javier pc, 1=Luis pc, 2=all phones,
+		int User=0;  //0 = Javier pc, 1=Luis pc, 2=all phones,
 		
 		
 		String folder_base_path = null;
@@ -49,7 +49,6 @@ public class Main {
 		 * ********************************************* */
 		Histogram histogram = null;
 		AccessPointOccurrence occurrency = new AccessPointOccurrence();
-		//AccessPointRSSIStrength rssi_filter = new AccessPointRSSIStrength(filepath);
 	
 		int numberOfCells =17;
 		int coverage_percentage= 50;
@@ -61,7 +60,6 @@ public class Main {
 		Path dir = Paths.get(filepath+pathToRawData);
 		
 		try (DirectoryStream<Path> stream = Files.newDirectoryStream(dir)) {
-			
 			
 			for(Path file : stream) {
 				if(file.getFileName().toString().startsWith("c", 0) && 
@@ -113,36 +111,22 @@ public class Main {
 	    rssi_filter.save_filtered_AP();
 	
 
-	    //step 6: Choose X amount of Access points 
-	
-	    //step 6: Choose X amount of Access points 
-    	ArrayList<Integer> chosen_ap = new ArrayList<Integer>(); //save list of chosen access points
+	    //step 6: Choose X amount of Access points as TrainingData
+   /* 	ArrayList<Integer> chosen_ap = new ArrayList<Integer>(); //save list of chosen access points
     	ArrayList<String> chosen_ap_names = new ArrayList<String>(); //save list of chosen access points
-    	
+        Scanner keyboard = new Scanner(System.in);
+    	Scanner id_scanner = null;
+        keyboard.useDelimiter("\\s*[,\n\r]\\s*");
+	    String data=null;
+		int data_id;
+		int ap_number;
+		   	
     	rssi_filter.display_normalAP();
     
   
-	    Scanner keyboard = new Scanner(System.in);
-	    keyboard.useDelimiter("\\s*[,\n\r]\\s*");
-	   // Readable keyboard2 = new (System.in);
-	    
-	   	   /*do{	 
-		   System.out.println("Choose some access points ");
-		    	
-	    	//chosen_ap.add(keyboard.nextLine());
-	    	chosen_ap.add(keyboard.next());
-	    	System.out.println(chosen_ap.get(i));
-	    	System.out.println(" i:"+i + "i++"+ ++i);
-	    	
-		  //  i++;
-	    }while(chosen_ap.get(i-1) != "3");
-	   //while(keyboard.next().length()>0);	  	    
-	  */  
-	  
-	   //read input as long enter is not pressed with with no accesspoint name
-	   //accesspoint captured  with pressing enter	    
-	   String data=null;
-	   int data_id;
+	
+	    //read input as long enter is not pressed with with no access-point name
+	   //access-point captured  with pressing enter	    
 	  
 	   System.out.println("\n\n................User Interface Access-Points selection.................");
 	   System.out.println("Choose some access points by id number");
@@ -150,11 +134,7 @@ public class Main {
 	   System.out.println("Press enter with no id, to finalize");
 	   System.out.println(".......................................................................\n\n\n");
 	   
-	   /* Tree map "id,String " */
-	   
 	   //number position of access-point in filtered access-point array list
-	   int ap_number;
-	   Scanner id_scanner = null;
 	   //read each line from user input, each line is ended with pressing enter
 	   //for each line read the number
 	   //stop reading, when no id is given and enter is pressed
@@ -167,10 +147,11 @@ public class Main {
 		   ap_number = id_scanner.nextInt()-1;  
 		   
 		   chosen_ap.add(ap_number);
+		   id_scanner.close();
 	   }
 	   
-//	   id_scanner.close();
-	   
+	   keyboard.close();
+
 	    System.out.println("number access points chosen:" + chosen_ap.size());
 	    System.out.println("Display of chosen access-points");
 	    
@@ -190,52 +171,22 @@ public class Main {
 	    	System.out.println("AP array name: "+chosen_ap_names.get(m));
 	    }
 	    
-	    //display now the list of chosen access points 
-	 
-	    //keyboard.close();
-	    //read the access points
-		/* 
-		 * 
-		 * */
-	    
-	
-        // Testing nextLine();
-        /*System.out.print("\nWhat is your name? ");
-         name = keyboard.nextLine();
- 
-        // Testing nextInt();
-        System.out.print("How many cats do you have? ");
-        int numberOfCats = keyboard.nextInt();
- 
-        // Testing nextDouble();
-        System.out.print("How much money is in your wallet? $");
-        double moneyInWallet = keyboard.nextDouble();
- 
-        System.out.println("\nHello " + name + "! You have " + numberOfCats
-                + (numberOfCats > 1 ? " cats" : " cat")
-                + " and $" + moneyInWallet + " in your wallet.\n");
-	    
-	    
-	    */
-	    
-	    
-	    
-	    keyboard.close();
 	       
+	    //keyboard.close();
 	    
-	    
+	 */
 	    
 	    //step 7: Create PMF table for each chosen Access Point
-		
+	    
 	    // Set of trainingdata. Each trainingdata is associated to one access-point
 	    ArrayList<TrainingData> tds = new ArrayList<TrainingData>();
 	    
 	    // Selected access-point names by the user
 	    ArrayList<String> names = new ArrayList<String>();
-	//    names.add("Conferentie-TUD_00_1b_90_76_d3_f6");
-	  //  names.add("eduroam_00_1b_90_76_d3_f0");
+	   names.add("Conferentie-TUD_00_1b_90_76_d3_f6");
+	    names.add("eduroam_00_1b_90_76_d3_f0");
 	    
-	    names = chosen_ap_names;
+	  //  names = chosen_ap_names;
 	    
 	    // new trainingdata
 	    TrainingData td;
@@ -266,8 +217,99 @@ public class Main {
 		/* *********************************************
 		 *  Phase 3: Apply Bayesian classification using the chosen Access points 
 		 * ********************************************* */
-//		String pmf_filepath = "/home/swifferayubu/Dropbox/Doc/cellsdata/3_Chosen_AP/2_PMF_AccessPoints_allCells/";
-		String folder_name="3_Chosen_AP/2_PMF_AccessPoints_allCells/";
+	     ArrayList<Float>observations = null;
+	      //naive bayesian classifier
+	      Bayesian naiveBayesian = new Bayesian(filepath);
+	      
+	      naiveBayesian.trainClassifier(tds);
+	
+	      
+	      
+	      
+	    Scanner keyboard2 = new Scanner(System.in);
+		
+	    
+	 ArrayList<Integer> observations2 = new ArrayList<Integer>();  
+	 observations2 = oberserveNewRssi(keyboard2,tds);
+	    
+	 int y;
+	 
+	 y=0;
+	    
+	     /*      
+	      Scanner id_scanner2=null;
+		keyboard2.useDelimiter("\\s*[,\n\r]\\s*");
+		ArrayList<Integer> rssi_value=new ArrayList<Integer>();
+		
+		String data2=null;
+			
+	  
+	
+		System.out.println("Fetching new rssi values");
+		    //read input as long enter is not pressed with with no access-point name
+		   //access-point captured  with pressing enter	    
+		  
+
+		   //number position of access-point in filtered access-point array list
+		   //read each line from user input, each line is ended with pressing enter
+		   //for each line read the number
+		   //stop reading, when no id is given and enter is pressed
+		   int i =0;
+		
+		System.out.println("Number of TrainingData:"+tds.size());
+		for(int t=0; t<tds.size(); t++)
+		   //while((data=keyboard.nextLine()).length() > 0)
+		   {
+
+			  //  System.out.print(tds.get(i)+":");
+			//    data2=keyboard2.nextLine();
+			  //  if(data2.length()>0)
+			   if((data2=keyboard2.nextLine()).length() > 0)
+				{
+				
+				   id_scanner2 = new Scanner(data2); //read new line
+				
+				 //fetch number for that line. 
+				   
+				
+				   rssi_value.add(id_scanner2.nextInt());  
+				   System.out.println(rssi_value.get(t));
+				   
+				}
+				else 
+					System.out.println("Sample missed");
+
+				   id_scanner2.close();
+		   }
+		  
+		   keyboard2.close();
+		
+
+	      System.out.println("Sampling done");
+	     */ 
+//	      oberserveNewRssi(tds);
+	      
+//	      observations.add((float) -74);
+//	      observations.add((float) -73);
+//	      observations.add((float) -83);
+//	      observations.add((float) -72);
+	      
+	     	      
+	      
+	      /* 
+	       *  //create/get the list of observations for the specific chosen access-points
+	       *  public ArrayList<Float> observeAP(tds){
+	       *  	//sense RSSI
+	       *    //take the rssi name is equavilant to a name in tds, save observation in array list 
+	       *  
+	       *  }
+	       *  
+	       * for 
+	       * */
+	      
+	      
+	      
+	      /*    String folder_name="3_Chosen_AP/2_PMF_AccessPoints_allCells/";
 		String pmf_filepath = filepath+folder_name;
 		
 		
@@ -292,17 +334,17 @@ public class Main {
 		float [][]ap2_pmf =Bclassifier.fetch_pmf(file_ap2);
 		float [][]ap3_pmf =Bclassifier.fetch_pmf(file_ap3);
 		float [][]ap4_pmf =Bclassifier.fetch_pmf(file_ap4);
-		
+	*/	
 		
 	    //initiate classifier
 		//Todo: Allow Bayesian to accept multiple access points
-		Bclassifier = new Bayesian(ap1_pmf,ap2_pmf, ap3_pmf, ap4_pmf); 	//step 8: Apply Bayesian classification
+	//	Bclassifier = new Bayesian(ap1_pmf,ap2_pmf, ap3_pmf, ap4_pmf); 	//step 8: Apply Bayesian classification
 		
 	    
 		//begin classification
-		Bclassifier.bayesian_classify(false);
+		//Bclassifier.bayesian_classify(false);
 		
-		Bayesian Bclassifier_laplace = new Bayesian(ap1_pmf,ap2_pmf, ap3_pmf, ap4_pmf);
+	//	Bayesian Bclassifier_laplace = new Bayesian(ap1_pmf,ap2_pmf, ap3_pmf, ap4_pmf);
 		//Bclassifier_laplace.bayesian_classify(true); 
 
 		
@@ -321,6 +363,72 @@ public class Main {
 		
 		//return chosen access-points
 		return null;
+	}
+	
+	/* 
+	 * This function reads the new RSSI observation sample for only the training data 
+	 * */
+	public static ArrayList<Integer> oberserveNewRssi(Scanner keyboard, ArrayList<TrainingData>tds)
+	{
+
+			Scanner id_scanner=null;
+			keyboard.useDelimiter("\\s*[,\n\r]\\s*");
+		
+			ArrayList<Integer> rssi_value=new ArrayList<Integer>();
+			
+			String data=null;
+				
+		  
+		
+			System.out.println("Fetching new rssi values");
+			    //read input as long enter is not pressed with with no access-point name
+			   //access-point captured  with pressing enter	    
+			  
+
+			   //number position of access-point in filtered access-point array list
+			   //read each line from user input, each line is ended with pressing enter
+			   //for each line read the number
+			   //stop reading, when no id is given and enter is pressed
+			   int i =0;
+			
+			System.out.println("Number of TrainingData:"+tds.size());
+		
+			for(int t=0; t<tds.size(); t++)
+			   //while((data=keyboard.nextLine()).length() > 0)
+			   {
+
+				  //  System.out.print(tds.get(i)+":");
+				//    data2=keyboard2.nextLine();
+				  //  if(data2.length()>0)
+				   if((data=keyboard.nextLine()).length() > 0)
+					{
+					
+					   id_scanner = new Scanner(data); //read new line
+					
+					 //fetch number for that line. 
+					   
+					
+					   rssi_value.add(id_scanner.nextInt());  
+					   System.out.println(rssi_value.get(t));
+					   
+					}
+					else 
+						System.out.println("Sample missed");
+
+					   id_scanner.close();
+			   }
+			  
+			   keyboard.close();
+			
+
+		      System.out.println("Sampling done");
+	
+		
+			
+		return rssi_value;
+		
+			
+		
 	}
 	
 	
