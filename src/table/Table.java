@@ -19,6 +19,15 @@ public class Table {
 	 */
 	public Table(String name) {
 		this.name = name;
+		
+		//initialize table. necessary to prevent error when doing  floatValue, and a null is present
+	/*	for(int i=0; i <table.length; i++)
+		{
+			for(int t=0; t<table[0].length; t++)
+				table[i][t]=0f;
+		}
+	*/
+		
 	}
 	
 	
@@ -40,9 +49,25 @@ public class Table {
 	
 	/*
 	 * Returns the pmf of this table at a given row (cell) and column (rssi)
+	 * if not using initializing of the 2D array at the constructor, return 0 for values which are null
+	 * uncomment the method which is desired, and comment the other
 	 */
 	public float getValue(int cell, int rssi) {
-		return this.table[cell][rssi].floatValue();
+		if(table[cell][rssi] ==null)
+		{
+			return 0;
+		}
+		else 
+		{
+			return this.table[cell][rssi].floatValue();
+		}
+		
+	
+	}
+	
+	public Float getValue2(int cell, int rssi) {
+		return this.table[cell][rssi];
+	
 	}
 	
 	
