@@ -175,7 +175,7 @@ public class Main {
 	 
 	      current_cell=   naiveBayesian.classifyObservation(observations);
 	      
-	      System.out.println("My location: Cell"+current_cell);
+	      System.out.println("My location is Cell "+current_cell);
 	     	 
 		
 	}

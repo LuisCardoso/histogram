@@ -5,6 +5,7 @@ import histogram.TrainingData;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Scanner;
 
 import com.sun.corba.se.impl.oa.poa.AOMEntry;
@@ -15,7 +16,7 @@ public class Bayesian {
 	//String folder_name="3_Chosen_AP/2_PMF_AccessPoints_allCells/";
 	String filepath="";
 	
-	
+	int nextMaxInded;
     // Set of training data. Each training data is associated to one access-point
     ArrayList<TrainingData> tds = new ArrayList<TrainingData>();
 	
@@ -111,6 +112,8 @@ public class Bayesian {
   
     	int temp;
     	int cellNumber;
+    	int max_rssi;
+    	int ap_index;
     	
 		setInitialBelieve();
 		//ClassificationEstimations.add("Uniform");
@@ -122,10 +125,12 @@ public class Bayesian {
 		
 		for(int t=0; t<tds.size(); t++)
 		{
-			//find the next strongest AP signal 
 			
+			ap_index = NextStrongestAP(observations2);
+		
+			System.out.println("AP name: "+tds.get(ap_index).getName() + "observation:"+observations2.get(ap_index));
 			//fetch the conditional probability of being in all cells and having that given rssi value for that given AP
-			sense_results = senseOneAP2(observations2.get(t), tds.get(t).getPMF()); //P(e[i]=r|H)
+			sense_results = senseOneAP2(observations2.get(ap_index), tds.get(ap_index).getPMF()); //P(e[i]=r|H)
 			posterior = vector_mult(this.prior, sense_results);	
 		
 	/*		System.out.println("prior !! ");
@@ -149,9 +154,9 @@ public class Bayesian {
 				bayesian_result = (int)(classification_result[0] +1);
 			}
 			
-		    System.out.println("cellnumbe:"+cellNumber);
+		 //   System.out.println("cellnumber:"+cellNumber);
 		    ClassificationEstimations.add( (int)(classification_result[0] +1));
-	     	System.out.println("Cell:" + ClassificationEstimations.get(t)); 
+	     //	System.out.println("Cell:" + ClassificationEstimations.get(t)); 
 						
 		}
 				
@@ -579,8 +584,48 @@ public class Bayesian {
     
     
     
+		public int findNextMaxRssi(ArrayList<Integer> observations2)
+		{
+			
+			
+			Integer [] temp = new Integer [observations2.size()];
+			
+			observations2.toArray(temp);
+			
+	        int max_rssi;
+	        Arrays.sort(temp);
+	        
+	        max_rssi=temp[temp.length -1-nextMaxInded++].intValue();
+	        
+			
+			//System.out.println("max "+ max_rssi);
+			
+
+			return max_rssi;
+			
+		}
+		
     
-    
-    
+       public int NextStrongestAP(ArrayList<Integer> observations2)
+       {
+    	   int max_rssi =0;
+    	   int ap_index = 0;
+    	   
+    		//find the next strongest AP signal 
+			max_rssi=findNextMaxRssi(observations2);
+	        for(int i=0; i<observations2.size(); i++)
+	        {
+	        	if(observations2.get(i).intValue() == max_rssi)
+	        	{
+	        		ap_index=i;
+	        	//	System.out.println("Next Ap index:"+ap_index);
+	        	}
+	        }
+			
+    	    return ap_index;
+    	   
+       }
+		
+		
 
 }
