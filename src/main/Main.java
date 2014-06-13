@@ -3,10 +3,8 @@ package main;
 import filter.AccessPointOccurrence;
 import filter.AccessPointRSSIStrength;
 import filter.SelectionAverage;
-
 import filter.SelectionCoverage;
 import gui.DataTable;
-
 import histogram.Histogram;
 import histogram.TrainingData;
 
@@ -19,6 +17,7 @@ import java.util.Scanner;
 import java.util.TreeMap;
 
 import Localizer.Bayesian;
+import Localizer.LaplaceBayesian;
 
 public class Main {
 
@@ -169,16 +168,35 @@ public class Main {
 	      
 	      naiveBayesian.trainClassifier(tds);
 	      
-	     //fetch new testing data to classify
+	      //set the initial believe to uniform
+	      naiveBayesian.setInitialBelieve();
+	      
+	      //fetch new testing data to classify
 	      ArrayList<Integer> observations = new ArrayList<Integer>();  
 	      observations = oberserveNewRssi(keyboard,tds);
 	 
 	      current_cell=   naiveBayesian.classifyObservation(observations);
 	      
 	      System.out.println("My location is Cell "+current_cell);
-	     	 
+	
+	      
+	      
+	      /* Try classification using Laplace */
+	      LaplaceBayesian laplaceClassifier = new LaplaceBayesian(filepath);
+	      laplaceClassifier.trainClassifier(tds);
+	      laplaceClassifier.setInitialBelieve();
+	      
+	     
+	      
 		
 	}
+	
+	
+	
+	
+	
+	
+	
 	
 	/* 
 	 * This function reads the new RSSI observation sample for only the training data 

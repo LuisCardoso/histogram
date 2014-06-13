@@ -30,34 +30,24 @@ public class Bayesian {
     
     static int numberOfCells = 17;
 	static int numberOfObservations = 4;
-	static int RSSI_Range = 100;
 	
-	static boolean Laplace_Correction = false;
-	static String classifier_type = "";
-	
+
 	//information about classifier accuracy
-	static float error_percentage;
-	static float accuracy;
+	public static float error_percentage;
+	public static float accuracy;
 	
 	
-	private float[] prior =  new float [numberOfCells];	
-	private float [] posterior = new float [numberOfCells];
+	public float[] prior =  new float [numberOfCells];	
+	public float [] posterior = new float [numberOfCells];
 
 	
 	static int callcount = 0;
-	static float [][][] TrainingData; // per access point hold their histogram. [Access point ID][Cell ID][RSSI value]
-
+	
 	//List of the PMF of the training data
 	//static ArrayList<Table> PMF_TrainingDataSet = new ArrayList<Table>();
 	
 	//static float [][] PM = new float [numberOfCells] [numberOfObservations];
    	public ArrayList<Float[][]> TrainingData_PMF = new ArrayList<Float[][]>();
-	
-   	//training data to classify
-	static public float [][]ap1_pmf;
-	static public float [][]ap2_pmf ;
-	static public float [][]ap3_pmf ;
-	static public float [][]ap4_pmf ;
 	
 	
 	public Bayesian(String filepath)
@@ -74,19 +64,17 @@ public class Bayesian {
 	}
 	
 	
+	public float [] get_posterior()
+	{
+		return this.posterior;
+	}
 	
-	/* Constructor which takes in the PMF distributions of the  four chosen Access Points  */
-   /* public  Bayesian(float [][]ap1_pmf,float [][]ap2_pmf,float [][]ap3_pmf,float [][]ap4_pmf ){
-   
-    	this.filepath=filepath;
-    	
-    	this.ap1_pmf=ap1_pmf;
-        this.ap2_pmf=ap2_pmf;
-        this.ap3_pmf=ap3_pmf;
-        this.ap4_pmf=ap4_pmf;
-    }
-    */   
-    
+	public float [] get_prior()
+	{
+		return this.prior;
+	}
+	
+	
 	
 	/*Train classifier, to know what PMF Table to use */
 	public void trainClassifier(ArrayList<TrainingData> trainingData)
@@ -100,7 +88,7 @@ public class Bayesian {
 	 * This function takes in the new observation sample, and returns the classification type. 
 	 *   */
 
-	public int classifyObservation(ArrayList<Integer> observations2)
+	public int classifyObservation(ArrayList<Integer> observations)
 	{
 	
 		int bayesian_result = 0;
@@ -115,7 +103,7 @@ public class Bayesian {
     	int max_rssi;
     	int ap_index;
     	
-		setInitialBelieve();
+		//setInitialBelieve();
 		//ClassificationEstimations.add("Uniform");
 		
 		/*for each training data, and its corresponding observation, apply the sense model 
@@ -126,11 +114,11 @@ public class Bayesian {
 		for(int t=0; t<tds.size(); t++)
 		{
 			
-			ap_index = NextStrongestAP(observations2);
+			ap_index = NextStrongestAP(observations);
 		
-			System.out.println("AP name: "+tds.get(ap_index).getName() + "observation:"+observations2.get(ap_index));
+			System.out.println("AP name: "+tds.get(ap_index).getName() + "observation:"+observations.get(ap_index));
 			//fetch the conditional probability of being in all cells and having that given rssi value for that given AP
-			sense_results = senseOneAP2(observations2.get(ap_index), tds.get(ap_index).getPMF()); //P(e[i]=r|H)
+			sense_results = senseOneAP(observations.get(ap_index), tds.get(ap_index).getPMF()); //P(e[i]=r|H)
 			posterior = vector_mult(this.prior, sense_results);	
 		
 	/*		System.out.println("prior !! ");
@@ -167,155 +155,7 @@ public class Bayesian {
 		
 	}
 	  
-    public  String bayesian_classify(boolean use_laplace){
-    	String bayesian_result=null;
-        
 
-    	float [] classification_result = new float [2];
-    	
-    	float[] prior =  new float [numberOfCells];	
-    	float [] posterior = new float [numberOfCells];
-    	float[] sense_results = new float [numberOfCells];         
-    	float [] observations = new float [numberOfObservations];
-    
-    	this.Laplace_Correction = use_laplace;
-    	
-    	
-    
-        
-    	//eduroam / confer / tudelft /  TUvistor
-        
-    	observations[0] = -74; 
-    	observations[1] = -73;
-    	observations[2] = -83;
-    	observations[3] = -72;
-
-            	
-        /* correct 0 conditional probability for a given cell and access point if
-	    	 * Send all PMF to the Laplace filter
-	    	 * */
-	    	/*if(Laplace_Correction)
-	    	{
-	    		
-	    		temp1_pmf=laplace_correction(ap1_pmf);
-	    		System.out.println("temp array  1 height:"+temp1_pmf.length);
-	    		System.out.println("temp array 1 width:"+temp1_pmf[0].length);
-	    		
-	    		
-	    		//temp1_pmf=laplace_correction(ap3_pmf);
-	    		
-	    		ap1_pmf=laplace_correction(ap1_pmf);
-		    	ap2_pmf=laplace_correction(ap2_pmf);
-	    		ap3_pmf=laplace_correction(ap3_pmf);
-	    		ap4_pmf=laplace_correction(ap4_pmf);
-	          
-	    		System.out.println("LAPLACE CORRECTION..............");
-	    
-	    	}
-        */
-	    	
-	    	
-	    	float rssi_observation = 0; //value observed for a given access point 
-	    	
-		    /* initialize buffers */
-			for(int i=0; i<posterior.length; i++) posterior[i]=(float)0;
-			for(int i=0; i<prior.length; i++) prior[i]=(float)0;
-			for(int i=0; i<sense_results.length; i++) sense_results[i]=(float)0;
-			
-			/* set uniform distribution for prior */
-			for(int i=0; i<prior.length; i++)
-			{
-				prior[i]= 	1/(float)(numberOfCells); //initial prior is uniform
-			}
-		
-				
-			//Probability Model for a specific AP, Histogram of e[i]
-			//output: conditional probability of being in all cells and having the rssi for that particular AP rssi,  P(ei=... |H)
-			//function layout: senseOneAP(AP[i] BSSID , AP[i] rssi value, AP[i] histogram )
-			
-	
-			//rssi_observation=0;	
-			sense_results = senseOneAP(observations[0], this.ap1_pmf); //P(e[i]=r|H)
-			
-			//do monitor correction if necessary, if permitted
-		/*	if(Laplace_Correction)
-			{
-				
-			}
-		*/
-			
-			posterior = vector_mult(prior, sense_results);
-			System.out.println("prior !! ");
-			display_1D(prior);
-			System.out.println("Sense Model !!");
-			display_1D(sense_results);
-			System.out.println("Posterior !!");
-			display_1D(posterior);
-			
-			System.arraycopy(posterior, 0, prior, 0, posterior.length); // update prior after 1 step.    
-		
-			//	rssi_observation=2;
-			sense_results = senseOneAP(observations[1], this.ap2_pmf); //P(e[i]=r|H)
-			posterior = vector_mult(prior, sense_results);
-			System.out.println("prior !! ");
-			display_1D(prior);
-			System.out.println("Sense Model !!");
-			display_1D(sense_results);
-			System.out.println("Posterior !!");
-			display_1D(posterior);
-			System.arraycopy(posterior, 0, prior, 0, posterior.length); //update prior after 2nd step
-		
-			
-			//rssi_observation=0;
-			sense_results = senseOneAP(observations[2], this.ap3_pmf); //P(e[i]=r|H)
-			posterior = vector_mult(prior, sense_results);
-			System.out.println("prior !! ");
-			display_1D(prior);
-			System.out.println("Sense Model !!");
-			display_1D(sense_results);
-			System.out.println("Posterior !!");
-			display_1D(posterior);
-			System.arraycopy(posterior, 0, prior, 0, posterior.length); //update prior after 3rd step
-		
-			
-//			rssi_observation=1;
-			sense_results = senseOneAP(observations[3], this.ap4_pmf); //P(e[i]=r|H)
-			posterior = vector_mult(prior, sense_results);
-			System.out.println("prior !! ");
-			display_1D(prior);
-			System.out.println("Sense Model !!");
-			display_1D(sense_results);
-			System.out.println("Posterior !!");
-			display_1D(posterior);
-			System.arraycopy(posterior, 0, prior, 0, posterior.length);//update prior after 4th step
-		
-			
-			System.out.println(" ~~~~~~~~~~~~~Final Posterior ~~~~~~~~~~~~");
-			display_1D(posterior);
-					
-			classification_result=getMaxValueandClassify(posterior);
-			
-			System.out.println("Classification cell: " + (classification_result[0]+1) + " -- value " + classification_result[1]  );
-			System.out.println(" ~~~~~~~~~~~~~ ~~~~~~~~~~~~");	
-			/* update prior after 1 step.    */
-	//		System.arraycopy(posterior, 0, prior, 0, posterior.length);
-	
-			
-			/* get P(E|H)*/
-			//perception = sense(prior,perception_model);
-			
-			
-			/* update prior */
-			//System.arraycopy(posterior, 0, prior, 0, posterior.length);
-			
-		    return bayesian_result;
-    }
-
-    
-    
-    
-    
-    
     
     /*
   * This functions receives measured rssi from a given accesspoint (ei), and the distribution of a specific AP over all cells
@@ -392,59 +232,7 @@ public class Bayesian {
     	  
     
      
-   /* This function takes the PMF of a given accesspoint, and adjust it according to the Laplace Filter*/
-    public float [][] laplace_correction(float [][]pmf)
-    {
-    	float p;   //p1 + p2 + ... + pn = 1
-    	float u;   // (a + u*pi)/p  where i= # of distinct values of rssi. and u*pi=1
-    	
-    	float [][] temp = new float[18][100];
-
-		// System.out.println("pmf array length:"+pmf[0].length);
-		    	
-    	// run through each cell distribution. skip first line since it holds the rssi values
-    	for(int c=1; c<numberOfCells; c++)
-    	{
-    		//copy data from Cell [i] for further processing if and only 0 probability exist in cell distribution
-    	   if( contains(pmf[c], 0)) 
-    	   {
-    		   
-    		   
-    		  u= pmf[0].length;
-    		  p=1/u;
-    		  
-    		  
-    		  //copy the rssi values in the first row of array. this is the label 
-    		  System.arraycopy(pmf[0], 0, temp[0], 0, pmf[0].length);
-    		  
-    		  // update each element in cell's array
-    		 for(int r=0; r<u; r++)
-    		 {
-    			 temp[c][r]= (pmf[c][r] + u*p)/ u;
-    			//	temp[c][r]= 3;
-    		 }
-    		 
-    		   
-    	   }
-    		
-    	}
-
-    	
-    	
-    	return temp;
-    	
-    }
-
-    //this functions checks if the array contains at least one value v
-    public static <T> boolean contains( final float[] array, final float v ) {
-        for ( final float e : array )
-            if ( e == v || v != 0f && v==e )
-                return true;
-
-        return false;
-    }
-    
-    
+       
 
     
     
@@ -550,7 +338,7 @@ public class Bayesian {
 	  *Functionality is to apply the sense model. So for a given observation it fetches the probabilty of being in each individual cell and having that rssi value.
 	  * 
 	  * */
-	    public static float [] senseOneAP2(Integer ap_observation, Table pmfTable)
+	    public static float [] senseOneAP(Integer ap_observation, Table pmfTable)
     
 	    //public static float [] senseOneAP2(Integer ap_observation, Float[][] td_pmfTable)
 	    {
@@ -568,7 +356,7 @@ public class Bayesian {
     				//sense_result[c]= pmfTable.getValue(3, 3); 
         			
     				sense_result[c]= pmfTable.getValue(c, Math.abs(ap_observation.intValue())); 
-    				//System.out.println("sense result["+c+"] : "+sense_result[c]);
+    				System.out.println("sense result["+c+"] : "+sense_result[c]);
     	    			
     			}
     		
@@ -583,29 +371,30 @@ public class Bayesian {
     
     
     
-    
+    /* @parameter 1: a list of rssi value for a given sample
+     * Find the next strongest rssi value 
+     * */
 		public int findNextMaxRssi(ArrayList<Integer> observations2)
 		{
-			
-			
+			int max_rssi;
 			Integer [] temp = new Integer [observations2.size()];
 			
 			observations2.toArray(temp);
 			
-	        int max_rssi;
+			//sort array in ascending order
 	        Arrays.sort(temp);
-	        
+	       
+	        //take last index and then continue taking that to the left
 	        max_rssi=temp[temp.length -1-nextMaxInded++].intValue();
 	        
-			
-			//System.out.println("max "+ max_rssi);
-			
-
 			return max_rssi;
 			
 		}
 		
-    
+
+		/* @parameter 1: a list of rssi value for a given sample
+		 * find the next Access-Point with the highest rssi value
+		 * */
        public int NextStrongestAP(ArrayList<Integer> observations2)
        {
     	   int max_rssi =0;
@@ -613,12 +402,13 @@ public class Bayesian {
     	   
     		//find the next strongest AP signal 
 			max_rssi=findNextMaxRssi(observations2);
+			
+			//find index of the next highest rssi value
 	        for(int i=0; i<observations2.size(); i++)
 	        {
 	        	if(observations2.get(i).intValue() == max_rssi)
 	        	{
 	        		ap_index=i;
-	        	//	System.out.println("Next Ap index:"+ap_index);
 	        	}
 	        }
 			
