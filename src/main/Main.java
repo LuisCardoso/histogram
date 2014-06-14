@@ -18,6 +18,7 @@ import java.util.TreeMap;
 
 import Localizer.Bayesian;
 import Localizer.LaplaceBayesian;
+import Localizer.NaiveBayesian;
 
 public class Main {
 
@@ -112,7 +113,7 @@ public class Main {
 	    
 
 	    //step 6: Choose X amount of Access points as TrainingData
-	    Scanner keyboard=new Scanner(System.in);
+	    Scanner keyboard = new Scanner(System.in);
 	    ArrayList<String> chosen_ap_names = new ArrayList<String>();
 	  
 	    chosen_ap_names = getNewAccessPoints(keyboard,rssi_filter);
@@ -120,26 +121,24 @@ public class Main {
 		    
 	    //step 7: Create PMF table for each chosen Access Point
 	    
-	    // Set of trainingdata. Each trainingdata is associated to one access-point
+	    // Set of training data. Each training data is associated to one access-point
 	    ArrayList<TrainingData> tds = new ArrayList<TrainingData>();
 	    
 	    // Selected access-point names by the user
-	    ArrayList<String> names = new ArrayList<String>();
-	  // names.add("Conferentie-TUD_00_1b_90_76_d3_f6");
-	   // names.add("eduroam_00_1b_90_76_d3_f0");
+	    //ArrayList<String> names = new ArrayList<String>();
+
+	   // names = chosen_ap_names;
 	    
-	    names = chosen_ap_names;
-	    
-	    // new trainingdata
+	    // new training data
 	    TrainingData td;
 	    
 	    // new access-point name to be associated with the training data
 	    String name = null;
 	    
 	    
-	      for(int i = 0; i < names.size(); i++) {
+	      for(int i = 0; i < chosen_ap_names.size(); i++) {
 	           
-	           name = names.get(i);
+	           name = chosen_ap_names.get(i);
 	           
 	      		td = new TrainingData(name, filepath);
 	      
@@ -165,11 +164,13 @@ public class Main {
 	      int current_cell2 = 0;
 	      
 	      //Naive Bayesian classifier
-	      Bayesian naiveBayesian = new Bayesian(filepath); //create classifier 
+	      NaiveBayesian naiveBayesian = new NaiveBayesian(filepath); //create classifier 
 	      naiveBayesian.trainClassifier(tds); //train classifier 	   
 	      naiveBayesian.setInitialBelieve();    //set the initial believe to uniform
 	      
 	    
+	 //     NaiveBayesian 
+	      
 	      /* Laplace classifier */
 		  LaplaceBayesian laplaceClassifier = new LaplaceBayesian(filepath);
 		  laplaceClassifier.trainClassifier(tds); //train classifier by updating training data. correction done automatically 
@@ -181,18 +182,19 @@ public class Main {
 	      ArrayList<Integer> observations = new ArrayList<Integer>();  
 	      observations = oberserveNewRssi(keyboard,tds);
 	 
-	      System.out.println("\n\nClassfication Type: Naive Bayesian");
+	 //     System.out.println("\n\nClassfication Type: Naive Bayesian");
 	      
 	      current_cell = naiveBayesian.classifyObservation(observations);
 	      
-	      System.out.println("My location is Cell "+current_cell);
+	   //   System.out.println("My location is Cell "+current_cell);
 	
-	      System.out.println("\n\nClassfication Type: Laplace");
-	      System.out.println("Size of laplace trainingData"+laplaceClassifier.getUpdatedTrainingData().size());
-		  
+	     // System.out.println("\n\nClassfication Type: Laplace");
+	     
 	      current_cell2 = laplaceClassifier.classifyObservation(observations);
 	      
-	      System.out.println("Bayesian: " + current_cell + "Laplace:"+ current_cell2);
+	      
+	      System.out.println("Results");
+	      System.out.println(" Bayesian => Cell: " + current_cell + "\n Laplace Cell:"+ current_cell2);
 	      
 	}
 	

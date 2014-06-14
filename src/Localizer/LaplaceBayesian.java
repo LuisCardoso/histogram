@@ -45,9 +45,7 @@ public class LaplaceBayesian extends Bayesian implements ClassifierAPI{
 	 *  */
 	public void trainClassifier(ArrayList<TrainingData> trainingDataList){
 		this.tds = trainingDataList; //save original training data
-		//tds_laplace  = new ArrayList<TrainingData>(trainingDataList); //make a copy of the training data for correction update
-	
-	
+		
 		String ap_name = null;
 		Float [][] table_histogram;
 		Float []cell_histogram;
@@ -70,8 +68,7 @@ public class LaplaceBayesian extends Bayesian implements ClassifierAPI{
 				cell_histogram = correctHistogram(table_histogram[c]); //update cell occurrences 
 				cell_pmf = correctPMF(cell_histogram,getCellOccurrences(cell_histogram));	// update cell PMF			
 				
-				//save information in a Table for TrainingData
-				
+				//save information in a Table for TrainingData			
 				td.putHistogramArrayIntoTable(cell_histogram, c);
 				td.putPMFArrayIntoTable(cell_pmf, c);
 				
@@ -89,28 +86,7 @@ public class LaplaceBayesian extends Bayesian implements ClassifierAPI{
 		return tds_laplace;
 		
 	}
-	
-	
-	    	/*if(Laplace_Correction)
-	    	{
-	    		
-	    		temp1_pmf=laplace_correction(ap1_pmf);
-	    		System.out.println("temp array  1 height:"+temp1_pmf.length);
-	    		System.out.println("temp array 1 width:"+temp1_pmf[0].length);
-	    		
-	    		
-	    		//temp1_pmf=laplace_correction(ap3_pmf);
-	    		
-	    		ap1_pmf=laplace_correction(ap1_pmf);
-		    	ap2_pmf=laplace_correction(ap2_pmf);
-	    		ap3_pmf=laplace_correction(ap3_pmf);
-	    		ap4_pmf=laplace_correction(ap4_pmf);
-	          
-	    		System.out.println("LAPLACE CORRECTION..............");
-	    
-	    	}
-        */
-	    	
+		    	
    
 	/*
 	 * This function takes in the new observation sample, and returns the classification type. 
@@ -126,10 +102,8 @@ public class LaplaceBayesian extends Bayesian implements ClassifierAPI{
     	float[] sense_results = new float [numberOfCells];         
 
   
-    	int temp;
     	int cellNumber;
-    	int max_rssi;
-    	int ap_index;
+       	int ap_index;
     	
 	
 		/*for each training data, and its corresponding observation, apply the sense model 
@@ -172,7 +146,8 @@ public class LaplaceBayesian extends Bayesian implements ClassifierAPI{
 		 //   System.out.println("cellnumber:"+cellNumber);
 		    ClassificationEstimations.add( (int)(classification_result[0] +1));
 	     //	System.out.println("Cell:" + ClassificationEstimations.get(t)); 
-						
+		    System.out.println("Cell: "+ (classification_result[0]+1) + "Probability: "+classification_result[0] );
+									
 		}
 				
 	    return bayesian_result;
@@ -246,14 +221,9 @@ public class LaplaceBayesian extends Bayesian implements ClassifierAPI{
     public Float [] correctHistogram(Float[] histogram)
     {
     	Float [] temp = new Float [histogram.length];
-    	int N=0; //current occurences
-    	
-    	
+	
     	System.arraycopy(histogram, 0, temp, 0, histogram.length);
-    	
-    	//get current occurrences 
-    	N= getCellOccurrences(temp);
-    	
+   
     	
     	for(int i=0; i<histogram.length; i++)
     	{
@@ -275,8 +245,7 @@ public class LaplaceBayesian extends Bayesian implements ClassifierAPI{
 
     private Float [] correctPMF(Float[]histogram_corrected, int occurrences)
     {
-    	//Float [] temp = new Float [pmf.length];
-    	
+   	
     	Float [] temp = new Float[histogram_corrected.length];
     	
     	System.arraycopy(histogram_corrected, 0, temp, 0, histogram_corrected.length);
@@ -293,7 +262,7 @@ public class LaplaceBayesian extends Bayesian implements ClassifierAPI{
     
     
     	
-	/* This function takes the PMF of a given accesspoint, and adjust it according to the Laplace Filter*/
+	/* This function takes the PMF of a given access point, and adjust it according to the Laplace Filter*/
     public float [][] laplace_correction1(float [][]pmf)
     {
     	float p;   //p1 + p2 + ... + pn = 1
