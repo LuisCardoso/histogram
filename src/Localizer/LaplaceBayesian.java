@@ -92,6 +92,7 @@ public class LaplaceBayesian extends Bayesian implements ClassifierAPI{
 	 * This function takes in the new observation sample, and returns the classification type. 
 	 *   */
 
+	//???????? The argument is a list of indexes of APs chosen by the user. And not rssi values ??????
 	public int classifyObservation(ArrayList<Integer> observations)
 	{
 	
