@@ -77,7 +77,7 @@ public class NaiveBayesian extends Bayesian implements ClassifierAPI{
 		 //   System.out.println("cellnumber:"+cellNumber);
 		    ClassificationEstimations.add( (int)(classification_result[0] +1));
 	     //	System.out.println("Cell:" + ClassificationEstimations.get(t)); 
-		    System.out.println("Cell: "+ (classification_result[0]+1) + "Probability: "+classification_result[0] );
+		    System.out.println("Cell: "+ (classification_result[0]+1) + "Probability: "+classification_result[1] );
 						
 		}
 				
