@@ -18,6 +18,7 @@ import java.util.TreeMap;
 
 import Localizer.Bayesian;
 import Localizer.LaplaceBayesian;
+import Localizer.NaiveBayesian;
 
 public class Main {
 
@@ -117,7 +118,7 @@ public class Main {
 	    
 
 	    //step 6: Choose X amount of Access points as TrainingData
-	    Scanner keyboard=new Scanner(System.in);
+	    Scanner keyboard = new Scanner(System.in);
 	    ArrayList<String> chosen_ap_names = new ArrayList<String>();
 	  
 	    chosen_ap_names = getNewAccessPoints(keyboard,rssi_filter);
@@ -125,35 +126,36 @@ public class Main {
 		    
 	    //step 7: Create PMF table for each chosen Access Point
 	    
-	    // Set of trainingdata. Each trainingdata is associated to one access-point
+	    // Set of training data. Each training data is associated to one access-point
 	    ArrayList<TrainingData> tds = new ArrayList<TrainingData>();
 	    
 	    // Selected access-point names by the user
-	    ArrayList<String> names = new ArrayList<String>();
-	  // names.add("Conferentie-TUD_00_1b_90_76_d3_f6");
-	   // names.add("eduroam_00_1b_90_76_d3_f0");
+	    //ArrayList<String> names = new ArrayList<String>();
+
+	   // names = chosen_ap_names;
 	    
-	    names = chosen_ap_names;
-	    
-	    // new trainingdata
+	    // new training data
 	    TrainingData td;
 	    
 	    // new access-point name to be associated with the training data
 	    String name = null;
 	    
 	    
+
 	    // create training data for each AP
-	    for(int i = 0; i < names.size(); i++) {
 
-	    	name = names.get(i);
+	      for(int i = 0; i < chosen_ap_names.size(); i++) {
+	           
+	           name = chosen_ap_names.get(i);
+	           
+	      		td = new TrainingData(name, filepath);
+	      
+	     	 	td.createPMFTable();
+	      		td.createHistogramTable();
+	      		
+	      		tds.add(td);
+	      }
 
-	    	td = new TrainingData(name, filepath);
-
-	    	td.createPMFTable();
-	    	td.createHistogramTable();
-
-	    	tds.add(td);
-	    }
 	     
 	      
 	      // Show training data in a table
@@ -167,16 +169,24 @@ public class Main {
 		/* *********************************************
 		 *  Phase 3: Apply Bayesian classification using the chosen Access points 
 		 * ********************************************* */
-	      int current_cell=0;
+	      int current_cell = 0;
+	      int current_cell2 = 0;
 	      
-	      //naive bayesian classifier
-	      Bayesian naiveBayesian = new Bayesian(filepath);
+	      //Naive Bayesian classifier
+	      NaiveBayesian naiveBayesian = new NaiveBayesian(filepath); //create classifier 
+	      naiveBayesian.trainClassifier(tds); //train classifier 	   
+	      naiveBayesian.setInitialBelieve();    //set the initial believe to uniform
 	      
-	      naiveBayesian.trainClassifier(tds);
+	    
+	 //     NaiveBayesian 
 	      
-	      //set the initial believe to uniform
-	      naiveBayesian.setInitialBelieve();
-	      
+	      /* Laplace classifier */
+		  LaplaceBayesian laplaceClassifier = new LaplaceBayesian(filepath);
+		  laplaceClassifier.trainClassifier(tds); //train classifier by updating training data. correction done automatically 
+		  laplaceClassifier.setInitialBelieve();
+		      
+		  
+		  
 	      //fetch new testing data to classify
 	      ArrayList<Integer> observations = new ArrayList<Integer>();  
 	      
@@ -186,23 +196,25 @@ public class Main {
 	      //???? and not a set of indexes of chosen AP inserted by the user
 	      observations = oberserveNewRssi(keyboard,tds);  
 	 
+
 	      
 	      //???? This function is receiving a set of AP indexes chosen by the user. And not rssi values
 	      //???? How does this function classify based only on the indexes and not on the rssi values
 	      current_cell=   naiveBayesian.classifyObservation(observations); 
+
+	 //     System.out.println("\n\nClassfication Type: Naive Bayesian");
+
 	      
-	      System.out.println("My location is Cell "+current_cell);
+	   //   System.out.println("My location is Cell "+current_cell);
 	
-	      
-	      
-	      /* Try classification using Laplace */
-	      LaplaceBayesian laplaceClassifier = new LaplaceBayesian(filepath);
-	      laplaceClassifier.trainClassifier(tds);
-	      laplaceClassifier.setInitialBelieve();
-	      
+	     // System.out.println("\n\nClassfication Type: Laplace");
 	     
+	      current_cell2 = laplaceClassifier.classifyObservation(observations);
 	      
-		
+	      
+	      System.out.println("Results");
+	      System.out.println(" Bayesian => Cell: " + current_cell + "\n Laplace Cell:"+ current_cell2);
+	      
 	}
 	
 	
@@ -347,13 +359,7 @@ public class Main {
 
 		
 		return chosen_ap_names;
-		
-		
-		
-		
-		
-		
-		
+	
 		
 	}
 	

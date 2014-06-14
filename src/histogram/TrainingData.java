@@ -310,4 +310,53 @@ public class TrainingData {
 		    System.out.println("Error: " +e.getMessage());
 		}
 	}
+	
+	
+	
+	/* This functions takes the cell histogram, given as an array and puts it the Histogram Table */
+	public void putHistogramArrayIntoTable(Float [] cellDistribution, int cell) {
+		
+	   	// Creates a new table if it does not exist yet
+    	if(histogramTable == null) {
+    		histogramTable = new Table(access_point_name);
+    	}
+    	
+		
+		
+		for(int i=0; i<cellDistribution.length; i++)
+		{
+		    histogramTable.setValue(
+	    		cell, 
+				i, 
+				cellDistribution[i]);
+
+		}			
+		
+	}
+		
+
+	
+	/* This functions takes the cell OMF, given as an array and puts it the Histogram Table */
+	public void putPMFArrayIntoTable(Float [] cellDistribution, int cell) {
+
+	   	// Creates a new table if it does not exist yet
+    	if(pmfTable == null) {
+    		pmfTable = new Table(access_point_name);
+    	}
+    	
+		
+		
+		for(int i=0; i<cellDistribution.length; i++)
+		{
+		    pmfTable.setValue(
+	    		cell, 
+				i, 
+				cellDistribution[i]);
+
+		}			
+		
+	}
+	
+	
+	
 }

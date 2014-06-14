@@ -17,11 +17,13 @@ public class Bayesian {
 	String filepath="";
 	
 	int nextMaxInded;
+	
+	
     // Set of training data. Each training data is associated to one access-point
-    ArrayList<TrainingData> tds = new ArrayList<TrainingData>();
+    public ArrayList<TrainingData> tds = new ArrayList<TrainingData>();
 	
     //for a given sample, keep track of all of the estimation calculated during each new posterior
-    ArrayList<Integer> ClassificationEstimations = new ArrayList<Integer>();
+    public ArrayList<Integer> ClassificationEstimations = new ArrayList<Integer>();
     
     //keep track of all the classification results and correct answer, in order to calculate accuracy of this classifier
    //   ArrayList<String> listOfClassification = new ArrayList<String>();
@@ -34,7 +36,7 @@ public class Bayesian {
 
 	//information about classifier accuracy
 	public static float error_percentage;
-	public static float accuracy;
+	public static float accuracy_percentage;
 	
 	
 	public float[] prior =  new float [numberOfCells];	
@@ -57,10 +59,7 @@ public class Bayesian {
 		 /* initialize buffers */
 		for(int i=0; i<this.posterior.length; i++) this.posterior[i]=(float)0;
 		for(int i=0; i<this.prior.length; i++) this.prior[i]=(float)0;
-		//for(int i=0; i<this.sense_results.length; i++) this.sense_results[i]=(float)0;
-	
-	
-	
+		
 	}
 	
 	
@@ -76,6 +75,7 @@ public class Bayesian {
 	
 	
 	
+
 	/*Train classifier, to know what PMF Table to use */
 	public void trainClassifier(ArrayList<TrainingData> trainingData)
 	{
@@ -148,12 +148,8 @@ public class Bayesian {
 		}
 				
 	    return bayesian_result;
-	
-	
-		
-		
 	}
-	  
+	
 
     
     /*

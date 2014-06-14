@@ -6,7 +6,10 @@ import java.util.ArrayList;
 
 import table.Table;
 
-public class LaplaceBayesian extends Bayesian{
+//import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils.Collections;
+
+
+public class LaplaceBayesian extends Bayesian implements ClassifierAPI{
 
 	/* 
 	 * formula for update 
@@ -19,15 +22,15 @@ public class LaplaceBayesian extends Bayesian{
 	 * xi is the previous occurrence of the rssi value
 	 * */
 	 private static int alpha=1; 
-	 private static int beta=101; 
-	//static private int numberOfSamples; //N
+	// private static int beta=101; 
+
+    // Save a next set of training data after doing laplace correction
+    public ArrayList<TrainingData> tds_laplace = new ArrayList<TrainingData>();
 	
 	
-	 // Save a next set of training data after doing laplace correction
-    ArrayList<TrainingData> tds_laplace = new ArrayList<TrainingData>();
-	
-	
-	
+    /*
+     * Constructor
+     *  */	
 	public LaplaceBayesian(String filepath) {
 		super(filepath);
 		// TODO Auto-generated constructor stub
@@ -36,68 +39,125 @@ public class LaplaceBayesian extends Bayesian{
 	}
 
 	
-	/*Train classifier, to know what PMF Table to use */
-	public void trainClassifier(ArrayList<TrainingData> trainingData){
-		this.tds=trainingData;
-		this.tds_laplace=trainingData;
+	/* @parameter 1: list of training data made from the chosen Access Points
+	 * Train classifier, to know what PMF Table to use
+	 * This function takes the old training data and corrects
+	 *  */
+	public void trainClassifier(ArrayList<TrainingData> trainingDataList){
+		this.tds = trainingDataList; //save original training data
 		
-		//apply Laplace correction to the training data
+		String ap_name = null;
+		Float [][] table_histogram;
+		Float []cell_histogram;
+		Float [] cell_pmf;
 		
-	String ap_name=null;
-	int cellID;
-	Float [][] table_histogram;
-	Float []cell_histogram;
-	Float [] cell_pmf;
-	
-	//for each training data, update the cell distribution data
-	for(int t=0; t<tds.size(); t++)
-	{
-		
-		ap_name=tds.get(t).getName();
-		
-		//get histogram  table
-		table_histogram=tds.get(t).getHistogram().getTable();
-	
-		//for each cell correct the Histogram and PMF Table
-		for(int c=0; c<table_histogram.length; c++)
-		{
-			cell_histogram=correctHistogram(table_histogram[c]);
-			cell_pmf=correctPMF(table_histogram[c],getCellOccurrences(cell_histogram));
+		//for each training data, update the cell distribution data
+		for(int t=0; t<tds.size(); t++)
+		{	
+			ap_name=tds.get(t).getName();
 			
+			//get histogram  table from Training Data
+			table_histogram=tds.get(t).getHistogram().getTable();
+		
+			//create a new training data 
+			TrainingData td = new TrainingData(ap_name, filepath);
+						
+			//for each cell correct the Histogram and PMF Table
+			for(int c=0; c<table_histogram.length; c++)      
+			{
+				cell_histogram = correctHistogram(table_histogram[c]); //update cell occurrences 
+				cell_pmf = correctPMF(cell_histogram,getCellOccurrences(cell_histogram));	// update cell PMF			
+				
+				//save information in a Table for TrainingData			
+				td.putHistogramArrayIntoTable(cell_histogram, c);
+				td.putPMFArrayIntoTable(cell_pmf, c);
+				
+			}			
+		
+			//add training data to list of adjusted training data's 
+			tds_laplace.add(td);
 			
-			
-		}
-		
-		
-		
-	}
-		
-		
-		
+		}		
 	}
 	
 	 		    
-	    	/*if(Laplace_Correction)
-	    	{
-	    		
-	    		temp1_pmf=laplace_correction(ap1_pmf);
-	    		System.out.println("temp array  1 height:"+temp1_pmf.length);
-	    		System.out.println("temp array 1 width:"+temp1_pmf[0].length);
-	    		
-	    		
-	    		//temp1_pmf=laplace_correction(ap3_pmf);
-	    		
-	    		ap1_pmf=laplace_correction(ap1_pmf);
-		    	ap2_pmf=laplace_correction(ap2_pmf);
-	    		ap3_pmf=laplace_correction(ap3_pmf);
-	    		ap4_pmf=laplace_correction(ap4_pmf);
-	          
-	    		System.out.println("LAPLACE CORRECTION..............");
-	    
-	    	}
-        */
-	    	
-    
+	public ArrayList<TrainingData> getUpdatedTrainingData ()
+	{
+		return tds_laplace;
+		
+	}
+		    	
+   
+	/*
+	 * This function takes in the new observation sample, and returns the classification type. 
+	 *   */
+
+	public int classifyObservation(ArrayList<Integer> observations)
+	{
+	
+		int bayesian_result = 0;
+   
+    	float [] classification_result = new float [2];  // return format is [0]= cellID, [1]: probability 
+    	
+    	float[] sense_results = new float [numberOfCells];         
+
+  
+    	int cellNumber;
+       	int ap_index;
+    	
+	
+		/*for each training data, and its corresponding observation, apply the sense model 
+		 * So find the probability of being in Cell[i], and having that rssi value for that given AP, 
+		 * Obtain an array with that probability for each cell
+		*/
+		
+		for(int t=0; t<tds_laplace.size(); t++)
+		{
+			
+			ap_index = NextStrongestAP(observations);
+		
+			System.out.println("AP name: "+tds_laplace.get(ap_index).getName() + "observation:"+observations.get(ap_index));
+	
+			//fetch the conditional probability of being in all cells and having that given rssi value for that given AP
+			sense_results = senseOneAP(observations.get(ap_index), tds_laplace.get(ap_index).getPMF()); //P(e[i]=r|H)
+			posterior = vector_mult(this.prior, sense_results);	
+		
+	/*		System.out.println("prior !! ");
+			display_1D(this.prior);
+			
+			System.out.println("Sense Model !!");
+			display_1D(sense_results);
+			
+			System.out.println("Posterior !!");
+			display_1D(this.posterior);
+	*/	
+			System.arraycopy(this.posterior, 0, this.prior, 0, this.posterior.length); // update prior after 1 step.    
+			
+			classification_result=getMaxValueandClassify(posterior);
+			
+			cellNumber= (int)(classification_result[0] +1);
+			
+			//update end result only if classification had a valid cell id
+			if( cellNumber >= 1)
+			{
+				bayesian_result = (int)(classification_result[0] +1);
+			}
+			
+		 //   System.out.println("cellnumber:"+cellNumber);
+		    ClassificationEstimations.add( (int)(classification_result[0] +1));
+	     //	System.out.println("Cell:" + ClassificationEstimations.get(t)); 
+		    System.out.println("Cell: "+ (classification_result[0]+1) + "Probability: "+classification_result[1] );
+									
+		}
+				
+	    return bayesian_result;
+	
+	
+		
+		
+	}
+	
+	
 		    
  
 	
@@ -158,22 +218,24 @@ public class LaplaceBayesian extends Bayesian{
     
     */
     
-    static public Float [] correctHistogram(Float[]histogram)
+    public Float [] correctHistogram(Float[] histogram)
     {
     	Float [] temp = new Float [histogram.length];
-    	int N=0; //current occurences
-    	
-    	
+	
     	System.arraycopy(histogram, 0, temp, 0, histogram.length);
-    	
-    	//get current occurrences 
-    	N= getCellOccurrences(temp);
-    	
+   
     	
     	for(int i=0; i<histogram.length; i++)
     	{
-    		
-    		temp[i]= (temp[i]+ alpha)/(N + alpha * beta);
+    		if(temp[i] == null)
+    		{
+    			//temp[i]= (0f + alpha)/(N + alpha * beta);
+    			temp[i]= 0f + alpha;
+    		}
+    		else{ 
+    			//temp[i]= (temp[i]+ alpha)/(N + alpha * beta);
+    			temp[i]= (temp[i]+ alpha);
+    		}
     	}
     	
     	return temp;
@@ -181,23 +243,26 @@ public class LaplaceBayesian extends Bayesian{
     
     
 
-    static private Float [] correctPMF(Float[]pmf, int occurrences)
+    private Float [] correctPMF(Float[]histogram_corrected, int occurrences)
     {
-    	//Float [] temp = new Float [pmf.length];
+   	
+    	Float [] temp = new Float[histogram_corrected.length];
     	
-    	for(int i=0; i<pmf.length; i++)
+    	System.arraycopy(histogram_corrected, 0, temp, 0, histogram_corrected.length);
+    	
+    	for(int i=0; i<temp.length; i++)
     	{
-    		pmf[i]= pmf[i] / occurrences; 
+    		if(temp[i] != null)
+    			temp[i]= temp[i] / occurrences; 
     	}
     	
-    	return pmf;
+    	return temp;
     }
     
     
     
-    
-	
-	/* This function takes the PMF of a given accesspoint, and adjust it according to the Laplace Filter*/
+    	
+	/* This function takes the PMF of a given access point, and adjust it according to the Laplace Filter*/
     public float [][] laplace_correction1(float [][]pmf)
     {
     	float p;   //p1 + p2 + ... + pn = 1
@@ -240,13 +305,14 @@ public class LaplaceBayesian extends Bayesian{
     	
     }
     
-    private static int getCellOccurrences(Float [] AP_CellDistribution)
+    private int getCellOccurrences(Float [] AP_CellDistribution)
     {
     	int count=0; 
     	
     	for(int i=0; i<AP_CellDistribution.length; i++)
     	{
-    		count += AP_CellDistribution[i].intValue();
+    		if(AP_CellDistribution[i] != null)
+    			count += AP_CellDistribution[i].intValue();
     	}
     	
     	return count;
@@ -315,7 +381,7 @@ public class LaplaceBayesian extends Bayesian{
 		//each array index corresponds to the correct rssi value for the table
 		for(int i=0; i<cellData.length; i++)
 		{
-			table.setValue(cellId, i, cellData[i]);
+			table.setValue(cellId, i, cellData[i].floatValue());
 		}
 		
 		
