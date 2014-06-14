@@ -161,34 +161,39 @@ public class Main {
 		/* *********************************************
 		 *  Phase 3: Apply Bayesian classification using the chosen Access points 
 		 * ********************************************* */
-	      int current_cell=0;
+	      int current_cell = 0;
+	      int current_cell2 = 0;
 	      
-	      //naive bayesian classifier
-	      Bayesian naiveBayesian = new Bayesian(filepath);
+	      //Naive Bayesian classifier
+	      Bayesian naiveBayesian = new Bayesian(filepath); //create classifier 
+	      naiveBayesian.trainClassifier(tds); //train classifier 	   
+	      naiveBayesian.setInitialBelieve();    //set the initial believe to uniform
 	      
-	      naiveBayesian.trainClassifier(tds);
-	      
-	      //set the initial believe to uniform
-	      naiveBayesian.setInitialBelieve();
-	      
+	    
+	      /* Laplace classifier */
+		  LaplaceBayesian laplaceClassifier = new LaplaceBayesian(filepath);
+		  laplaceClassifier.trainClassifier(tds); //train classifier by updating training data. correction done automatically 
+		  laplaceClassifier.setInitialBelieve();
+		      
+		  
+		  
 	      //fetch new testing data to classify
 	      ArrayList<Integer> observations = new ArrayList<Integer>();  
 	      observations = oberserveNewRssi(keyboard,tds);
 	 
-	      current_cell=   naiveBayesian.classifyObservation(observations);
+	      System.out.println("\n\nClassfication Type: Naive Bayesian");
+	      
+	      current_cell = naiveBayesian.classifyObservation(observations);
 	      
 	      System.out.println("My location is Cell "+current_cell);
 	
+	      System.out.println("\n\nClassfication Type: Laplace");
+	      System.out.println("Size of laplace trainingData"+laplaceClassifier.getUpdatedTrainingData().size());
+		  
+	      current_cell2 = laplaceClassifier.classifyObservation(observations);
 	      
+	      System.out.println("Bayesian: " + current_cell + "Laplace:"+ current_cell2);
 	      
-	      /* Try classification using Laplace */
-	      LaplaceBayesian laplaceClassifier = new LaplaceBayesian(filepath);
-	      laplaceClassifier.trainClassifier(tds);
-	      laplaceClassifier.setInitialBelieve();
-	      
-	     
-	      
-		
 	}
 	
 	
@@ -326,13 +331,7 @@ public class Main {
 
 		
 		return chosen_ap_names;
-		
-		
-		
-		
-		
-		
-		
+	
 		
 	}
 	

@@ -17,6 +17,8 @@ public class Bayesian {
 	String filepath="";
 	
 	int nextMaxInded;
+	
+	
     // Set of training data. Each training data is associated to one access-point
     ArrayList<TrainingData> tds = new ArrayList<TrainingData>();
 	
@@ -34,7 +36,7 @@ public class Bayesian {
 
 	//information about classifier accuracy
 	public static float error_percentage;
-	public static float accuracy;
+	public static float accuracy_percentage;
 	
 	
 	public float[] prior =  new float [numberOfCells];	
