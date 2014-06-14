@@ -23,7 +23,7 @@ public class Main {
 
 	public static void main(String[] args) {
 		
-		int User=0;  //0 = Javier pc, 1=Luis pc, 2=all phones,
+		int User=1;  //0 = Javier pc, 1=Luis pc, 2=all phones,
 		
 		
 		String folder_base_path = null;
@@ -103,10 +103,15 @@ public class Main {
 		AccessPointRSSIStrength rssi_filter= new AccessPointRSSIStrength(filepath); //new
 		
 		Data_filterphase1 = rssi_filter.fetch_AP_and_RSSIavg(); //fetch access points from filter 1
-	    rssi_filter.filter_rssi_too_strong_Tree(Data_filterphase1);//filter data by rssi strength
+	    
+		//filter data by rssi strength
+		// all rssi strength that are outside the std deviation are removed
+		rssi_filter.filter_rssi_too_strong_Tree(Data_filterphase1);
 			
 	    
 	   // rssi_filter.display_normalAP();
+	    
+	    // write to file the AP that remained after filtering
 	    rssi_filter.save_filtered_AP();
 	    
 	    
@@ -137,17 +142,18 @@ public class Main {
 	    String name = null;
 	    
 	    
-	      for(int i = 0; i < names.size(); i++) {
-	           
-	           name = names.get(i);
-	           
-	      		td = new TrainingData(name, filepath);
-	      
-	     	 	td.createPMFTable();
-	      		td.createHistogramTable();
-	      		
-	      		tds.add(td);
-	      }
+	    // create training data for each AP
+	    for(int i = 0; i < names.size(); i++) {
+
+	    	name = names.get(i);
+
+	    	td = new TrainingData(name, filepath);
+
+	    	td.createPMFTable();
+	    	td.createHistogramTable();
+
+	    	tds.add(td);
+	    }
 	     
 	      
 	      // Show training data in a table
@@ -173,9 +179,17 @@ public class Main {
 	      
 	      //fetch new testing data to classify
 	      ArrayList<Integer> observations = new ArrayList<Integer>();  
-	      observations = oberserveNewRssi(keyboard,tds);
+	      
+	      
+	      //??????????? By inspecting the body of this function I couldn't deduce how it works. ????????????????????
+	      //????? Based on the name of this function, I believe that this function should return a set of rssi values
+	      //???? and not a set of indexes of chosen AP inserted by the user
+	      observations = oberserveNewRssi(keyboard,tds);  
 	 
-	      current_cell=   naiveBayesian.classifyObservation(observations);
+	      
+	      //???? This function is receiving a set of AP indexes chosen by the user. And not rssi values
+	      //???? How does this function classify based only on the indexes and not on the rssi values
+	      current_cell=   naiveBayesian.classifyObservation(observations); 
 	      
 	      System.out.println("My location is Cell "+current_cell);
 	
@@ -203,6 +217,10 @@ public class Main {
 	 * */
 	public static ArrayList<Integer> oberserveNewRssi(Scanner keyboard, ArrayList<TrainingData>tds)
 	{
+		
+		// ?????????????????? This function does nothing with the argument 'tds' besides printing its size and the corresponding name ??????????
+		// ???????????? This function returns the index number of AP chosen by the user. And not rssi values of the corresponding AP ???????
+		
 
 			Scanner id_scanner=null;
 			keyboard.useDelimiter("\\s*[,\n\r]\\s*");
@@ -239,6 +257,8 @@ public class Main {
 					
 					 //fetch number for that line. 
 					   
+					   
+					 //??????? id_scanner.nextInt() is not a rssi_value but the index of chosen AP, which was inserted by the user ???????
 					   rssi_value.add(id_scanner.nextInt());  
 					   System.out.println(" ");
 					   
@@ -266,7 +286,7 @@ public class Main {
 	static public ArrayList<String>  getNewAccessPoints(Scanner keyboard, AccessPointRSSIStrength rssi_filter)
 	{
 		ArrayList<Integer> chosen_ap = new ArrayList<Integer>(); //save list of chosen access points
-    	ArrayList<String> chosen_ap_names = new ArrayList<String>(); //save list of chosen access points
+    	ArrayList<String> chosen_ap_names = new ArrayList<String>(); //save list of chosen access points names
     	Scanner id_scanner = null;
         keyboard.useDelimiter("\\s*[,\n\r]\\s*");
 	    String data=null;
@@ -317,6 +337,7 @@ public class Main {
 		    }
 		    
 		    
+		    // Print on the screen the chosen APs
 		    for(int m=0; m<chosen_ap_names.size(); m++)
 		    {
 		    	System.out.println("AP array name: "+chosen_ap_names.get(m));

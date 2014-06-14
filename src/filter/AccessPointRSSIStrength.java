@@ -46,7 +46,7 @@ public class AccessPointRSSIStrength {
 		TreeMap<String,Float> filedata = new TreeMap<String,Float>();
 		
 		String folder_name="2_Filter/selection/";
-    		
+		
 		//String readfile = filepath+"selectionAvg.txt";
 		String readfile = filepath+folder_name+"selectionAvg.txt";
 		

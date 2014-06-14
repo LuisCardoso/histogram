@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Scanner;
 
-import com.sun.corba.se.impl.oa.poa.AOMEntry;
+//import com.sun.corba.se.impl.oa.poa.AOMEntry;
 
 import table.Table;
 
@@ -80,15 +80,14 @@ public class Bayesian {
 	public void trainClassifier(ArrayList<TrainingData> trainingData)
 	{
 		this.tds = trainingData;
-	
-		
 	}
 	
 	/*
 	 * This function takes in the new observation sample, and returns the classification type. 
 	 *   */
 
-	public int classifyObservation(ArrayList<Integer> observations)
+	//???????? The argument is a list of indexes of APs chosen by the user. And not rssi values ??????
+	public int classifyObservation(ArrayList<Integer> observations) 
 	{
 	
 		int bayesian_result = 0;
@@ -395,7 +394,9 @@ public class Bayesian {
 		/* @parameter 1: a list of rssi value for a given sample
 		 * find the next Access-Point with the highest rssi value
 		 * */
-       public int NextStrongestAP(ArrayList<Integer> observations2)
+		
+		//???????? The argument is a list of indexes of APs chosen by the user. And rssi values ??????
+       public int NextStrongestAP(ArrayList<Integer> observations2)  
        {
     	   int max_rssi =0;
     	   int ap_index = 0;
