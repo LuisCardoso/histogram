@@ -19,6 +19,7 @@ import java.util.TreeMap;
 import Localizer.Bayesian;
 import Localizer.LaplaceBayesian;
 import Localizer.NaiveBayesian;
+import Localizer.ProbablisticBayesian;
 
 public class Main {
 
@@ -186,20 +187,19 @@ public class Main {
 		  laplaceClassifier.setInitialBelieve();
 		      
 		  
+		  /* Probablistic classifier */
+		  ProbablisticBayesian probablisticClassifier = new ProbablisticBayesian(filepath);
+		  probablisticClassifier.trainClassifier(tds); //train classifier by updating training data. correction done automatically 
+		  probablisticClassifier.setInitialBelieve();
+		  
+		  
+		  
 		  
 	      //fetch new testing data to classify
 	      ArrayList<Integer> observations = new ArrayList<Integer>();  
 	      
 	      
-	      //??????????? By inspecting the body of this function I couldn't deduce how it works. ????????????????????
-	      //????? Based on the name of this function, I believe that this function should return a set of rssi values
-	      //???? and not a set of indexes of chosen AP inserted by the user
 	      observations = oberserveNewRssi(keyboard,tds);  
-	 
-
-	      
-	      //???? This function is receiving a set of AP indexes chosen by the user. And not rssi values
-	      //???? How does this function classify based only on the indexes and not on the rssi values
 	      current_cell=   naiveBayesian.classifyObservation(observations); 
 
 	 //     System.out.println("\n\nClassfication Type: Naive Bayesian");
