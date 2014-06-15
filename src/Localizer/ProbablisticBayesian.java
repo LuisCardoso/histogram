@@ -15,12 +15,13 @@ public class ProbablisticBayesian extends Bayesian implements ClassifierAPI{
 	private ArrayList<Integer> count_list;
 	
 	
-	//Save a next set of training data after doing laplace correction
+	//Save a next set of training data after doing Gaussian Distribution correction
 	public ArrayList<TrainingData> tds_PBayesian = new ArrayList<TrainingData>();
 	
 	
 	
-	
+	/* Constructor, 
+	 * save the base path to all of the data */
 	public ProbablisticBayesian(String filepath){
 		super(filepath);
 		
@@ -53,11 +54,23 @@ public class ProbablisticBayesian extends Bayesian implements ClassifierAPI{
 			//for each cell correct the PMF Table
 			for(int c=0; c<table_histogram.length; c++)      
 			{
+			
+				
+			
+				
 				cell_pmf = correctPMF(table_histogram[c],getCellOccurrences(table_histogram[c]));	// update cell PMF			
+			
+				if(c==0){
+					System.out.println("Cell id:" + (c+1) );
+					for(int i=0; i<cell_pmf.length; i++)
+					{
+					//	System.out.println("rssi: " + i + "  probability: "+ cell_pmf[i]);
+					}
+				}
 				
 				//save information in a Table for TrainingData			
-					td.putHistogramArrayIntoTable(table_histogram[c], c); //save the original histogram
-					td.putPMFArrayIntoTable(cell_pmf, c);
+			//		td.putHistogramArrayIntoTable(table_histogram[c], c); //save the original histogram
+			//		td.putPMFArrayIntoTable(cell_pmf, c);
 					
 			}			
 		
@@ -177,25 +190,40 @@ public class ProbablisticBayesian extends Bayesian implements ClassifierAPI{
 		Float [] temp = new Float[histogram_corrected.length];
 		float mean = 0;
 		float std = 0;
+		float [] probResult = new float [histogram_corrected.length];
+		
 		
 		System.arraycopy(histogram_corrected, 0, temp, 0, histogram_corrected.length);
 		
 		//calculate mean 
 		mean = calculateMean(temp, occurrences);
+		System.out.println("Mean: " + mean );
+		
 		
 		//calculate std 
 		std = calculateSTD( temp, mean, occurrences );
+		System.out.println("STD: " + std );
 		
 		//Correct probability per rssi value
 		
 		
 		for(int i=0; i<temp.length; i++)
 		{
-			temp[i] = getProbabilityNormalDistribution(temp[i].intValue(), mean, std); //unnecessary to have histogram as float
+			
+			probResult[i]=getProbabilityNormalDistribution( (-i), mean, std);
+		//	temp[i] = getProbabilityNormalDistribution(temp[i].intValue(), mean, std); //unnecessary to have histogram as float
 				
 		//	if(temp[i] != null)
 			//	temp[i]= temp[i] / occurrences; 
 		}
+		
+		for(int i=probResult.length-1; i >=0; i--)
+    	{
+    		System.out.println( probResult[i]);
+    	}
+
+		
+		
 		
 		return temp;
 	}
@@ -212,11 +240,17 @@ public class ProbablisticBayesian extends Bayesian implements ClassifierAPI{
 	public float calculateMean(Float [] cellDistribution, int occurrences){
 		float mean =0; 
 		float sum=0;
+		float rssi_sum =0; //total sum of given rssi, including occurrences. 
 		
 		for(int i=0; i<cellDistribution.length; i++)
 		{
-			if(cellDistribution != null)
-				sum  += cellDistribution[i];
+			
+			if(cellDistribution[i] != null){
+				// add the sum of that rssi value, with the amount of times appeard
+				//correct also for the fact rssi values are negative, but we took absolute value for index id
+				rssi_sum = (-i) * cellDistribution[i]; 
+				sum  += rssi_sum;
+			}
 		}
 		
 		mean = sum/ occurrences ;
@@ -267,11 +301,14 @@ public class ProbablisticBayesian extends Bayesian implements ClassifierAPI{
 	 * Calculate the variance from a set data
 	 * */
 	public float calculateVariance(Float [] dataset,float mean, int occurrences){
-		float variance=0;
+		float variance=0; //(1/N)*  sigma [(xi-u)^2 ]
 	
 		for(int i=0; i<dataset.length; i++)
 		{
-			if(dataset[i] == null)
+			
+			variance += Math.pow( (-i) - (double)(mean), 2);  
+			
+		/*	if(dataset[i] == null)
 			{
 				variance += Math.pow( 0 - (double)(mean), 2);
 	
@@ -281,6 +318,7 @@ public class ProbablisticBayesian extends Bayesian implements ClassifierAPI{
 				variance += Math.pow( dataset[i].doubleValue() - (double)(mean), 2);
 	
 			}
+	*/
 		}	
 		variance = variance/ occurrences;
 			

@@ -25,7 +25,7 @@ public class Main {
 
 	public static void main(String[] args) {
 		
-		int User=1;  //0 = Javier pc, 1=Luis pc, 2=all phones,
+		int User=0;  //0 = Javier pc, 1=Luis pc, 2=all phones,
 		
 		
 		String folder_base_path = null;
@@ -174,18 +174,18 @@ public class Main {
 	      int current_cell2 = 0;
 	      
 	      //Naive Bayesian classifier
-	      NaiveBayesian naiveBayesian = new NaiveBayesian(filepath); //create classifier 
+	    /*  NaiveBayesian naiveBayesian = new NaiveBayesian(filepath); //create classifier 
 	      naiveBayesian.trainClassifier(tds); //train classifier 	   
 	      naiveBayesian.setInitialBelieve();    //set the initial believe to uniform
-	      
+	      */
 	    
 	 //     NaiveBayesian 
 	      
 	      /* Laplace classifier */
-		  LaplaceBayesian laplaceClassifier = new LaplaceBayesian(filepath);
+		  /*LaplaceBayesian laplaceClassifier = new LaplaceBayesian(filepath);
 		  laplaceClassifier.trainClassifier(tds); //train classifier by updating training data. correction done automatically 
 		  laplaceClassifier.setInitialBelieve();
-		      
+		    */  
 		  
 		  /* Probablistic classifier */
 		  ProbablisticBayesian probablisticClassifier = new ProbablisticBayesian(filepath);
@@ -200,7 +200,7 @@ public class Main {
 	      
 	      
 	      observations = oberserveNewRssi(keyboard,tds);  
-	      current_cell=   naiveBayesian.classifyObservation(observations); 
+	     // current_cell=   naiveBayesian.classifyObservation(observations); 
 
 	 //     System.out.println("\n\nClassfication Type: Naive Bayesian");
 
@@ -209,7 +209,9 @@ public class Main {
 	
 	     // System.out.println("\n\nClassfication Type: Laplace");
 	     
-	      current_cell2 = laplaceClassifier.classifyObservation(observations);
+	      //current_cell2 = laplaceClassifier.classifyObservation(observations);
+	      
+	      
 	      
 	      
 	      System.out.println("Results");
