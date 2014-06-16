@@ -15,6 +15,7 @@ import table.Table;
 public class Bayesian {
 	//String folder_name="3_Chosen_AP/2_PMF_AccessPoints_allCells/";
 	String filepath="";
+	public String classificationName="";
 	
 	int nextMaxInded;
 	
@@ -52,9 +53,10 @@ public class Bayesian {
    	public ArrayList<Float[][]> TrainingData_PMF = new ArrayList<Float[][]>();
 	
 	
-	public Bayesian(String filepath)
+	public Bayesian(String filepath, String classifierName)
 	{
 		this.filepath=filepath;
+		this.classificationName=classifierName;
 	
 		 /* initialize buffers */
 		for(int i=0; i<this.posterior.length; i++) this.posterior[i]=(float)0;
@@ -62,6 +64,10 @@ public class Bayesian {
 		
 	}
 	
+	public String getClassiferName()
+	{
+		return classificationName;
+	}
 	
 	public float [] get_posterior()
 	{
@@ -102,9 +108,8 @@ public class Bayesian {
     	int max_rssi;
     	int ap_index;
     	
-		//setInitialBelieve();
-		//ClassificationEstimations.add("Uniform");
-		
+	
+    	
 		/*for each training data, and its corresponding observation, apply the sense model 
 		 * So find the probability of being in Cell[i], and having that rssi value for that given AP, 
 		 * Obtain an array with that probability for each cell
@@ -120,15 +125,6 @@ public class Bayesian {
 			sense_results = senseOneAP(observations.get(ap_index), tds.get(ap_index).getPMF()); //P(e[i]=r|H)
 			posterior = vector_mult(this.prior, sense_results);	
 		
-	/*		System.out.println("prior !! ");
-			display_1D(this.prior);
-			
-			System.out.println("Sense Model !!");
-			display_1D(sense_results);
-			
-			System.out.println("Posterior !!");
-			display_1D(this.posterior);
-	*/	
 			System.arraycopy(this.posterior, 0, this.prior, 0, this.posterior.length); // update prior after 1 step.    
 			
 			classification_result=getMaxValueandClassify(posterior);
@@ -391,8 +387,7 @@ public class Bayesian {
 		 * find the next Access-Point with the highest rssi value
 		 * */
 		
-		//???????? The argument is a list of indexes of APs chosen by the user. And not rssi values ??????
-       public int NextStrongestAP(ArrayList<Integer> observations2)  
+	   public int NextStrongestAP(ArrayList<Integer> observations2)  
        {
     	   int max_rssi =0;
     	   int ap_index = 0;

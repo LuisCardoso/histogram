@@ -7,10 +7,18 @@ import java.util.ArrayList;
 public class NaiveBayesian extends Bayesian implements ClassifierAPI{
 
 	public NaiveBayesian(String filepath) {
-		super(filepath);
+		super(filepath,"Deterministic Bayesian");
 		// TODO Auto-generated constructor stub
 	}
 
+	
+	/* 
+	 * Get Training Data for this unique Classifier
+	 * */ 	
+	public ArrayList<TrainingData>  getPersonalTrainingData()
+	{
+		return tds;
+	}
 	
 	
 	/* Train classifier, to know what PMF Table to use */
@@ -20,6 +28,10 @@ public class NaiveBayesian extends Bayesian implements ClassifierAPI{
 		
 		
 	}
+	
+	
+	
+	
 	
 	
 	/*
@@ -52,16 +64,7 @@ public class NaiveBayesian extends Bayesian implements ClassifierAPI{
 			//fetch the conditional probability of being in all cells and having that given rssi value for that given AP
 			sense_results = senseOneAP(observations.get(ap_index), tds.get(ap_index).getPMF()); //P(e[i]=r|H)
 			posterior = vector_mult(this.prior, sense_results);	
-		
-	/*		System.out.println("prior !! ");
-			display_1D(this.prior);
-			
-			System.out.println("Sense Model !!");
-			display_1D(sense_results);
-			
-			System.out.println("Posterior !!");
-			display_1D(this.posterior);
-	*/	
+
 			System.arraycopy(this.posterior, 0, this.prior, 0, this.posterior.length); // update prior after 1 step.    
 			
 			classification_result=getMaxValueandClassify(posterior);

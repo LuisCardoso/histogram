@@ -6,7 +6,7 @@ import java.util.ArrayList;
 
 import com.sun.xml.internal.bind.v2.schemagen.xmlschema.Occurs;
 
-public class ProbablisticBayesian extends Bayesian implements ClassifierAPI{
+public class ProbabilisticBayesian extends Bayesian implements ClassifierAPI{
 
 	//keep track of the statistics of each cell
 	private ArrayList<Float> mean_list;
@@ -22,9 +22,17 @@ public class ProbablisticBayesian extends Bayesian implements ClassifierAPI{
 	
 	/* Constructor, 
 	 * save the base path to all of the data */
-	public ProbablisticBayesian(String filepath){
-		super(filepath);
+	public ProbabilisticBayesian(String filepath){
+		super(filepath, "Probablistic Bayesian");
 		
+	}
+	
+	/* 
+	 * Get Training Data for this unique Classifier
+	 * */ 	
+	public ArrayList<TrainingData>  getPersonalTrainingData()
+	{
+		return tds_PBayesian;
 	}
 	
 	
@@ -57,20 +65,14 @@ public class ProbablisticBayesian extends Bayesian implements ClassifierAPI{
 			
 				
 			
-				
+				//create a PMF table with guassian distribution
 				cell_pmf = correctPMF(table_histogram[c],getCellOccurrences(table_histogram[c]));	// update cell PMF			
 			
-				if(c==0){
-					System.out.println("Cell id:" + (c+1) );
-					for(int i=0; i<cell_pmf.length; i++)
-					{
-					//	System.out.println("rssi: " + i + "  probability: "+ cell_pmf[i]);
-					}
-				}
-				
+		
+			
 				//save information in a Table for TrainingData			
-			//		td.putHistogramArrayIntoTable(table_histogram[c], c); //save the original histogram
-			//		td.putPMFArrayIntoTable(cell_pmf, c);
+				//	td.putHistogramArrayIntoTable(table_histogram[c], c); //save the original histogram
+					td.putPMFArrayIntoTable(cell_pmf, c);
 					
 			}			
 		
@@ -183,6 +185,7 @@ public class ProbablisticBayesian extends Bayesian implements ClassifierAPI{
 	
 	/* 
 	 * Correct the PMF table according to a normal gaussian distribution
+	 * Done for one Cell at a time, for one Access-Point
 	 * */
 	private Float [] correctPMF(Float[]histogram_corrected, int occurrences)
 	{
@@ -190,19 +193,19 @@ public class ProbablisticBayesian extends Bayesian implements ClassifierAPI{
 		Float [] temp = new Float[histogram_corrected.length];
 		float mean = 0;
 		float std = 0;
-		float [] probResult = new float [histogram_corrected.length];
+		Float [] probResult = new Float [histogram_corrected.length];
 		
 		
 		System.arraycopy(histogram_corrected, 0, temp, 0, histogram_corrected.length);
 		
 		//calculate mean 
 		mean = calculateMean(temp, occurrences);
-		System.out.println("Mean: " + mean );
+	//	System.out.println("Mean: " + mean );
 		
 		
 		//calculate std 
 		std = calculateSTD( temp, mean, occurrences );
-		System.out.println("STD: " + std );
+		//System.out.println("STD: " + std );
 		
 		//Correct probability per rssi value
 		
@@ -211,21 +214,12 @@ public class ProbablisticBayesian extends Bayesian implements ClassifierAPI{
 		{
 			
 			probResult[i]=getProbabilityNormalDistribution( (-i), mean, std);
-		//	temp[i] = getProbabilityNormalDistribution(temp[i].intValue(), mean, std); //unnecessary to have histogram as float
-				
-		//	if(temp[i] != null)
-			//	temp[i]= temp[i] / occurrences; 
+
 		}
-		
-		for(int i=probResult.length-1; i >=0; i--)
-    	{
-    		System.out.println( probResult[i]);
-    	}
 
 		
 		
-		
-		return temp;
+		return probResult;
 	}
 	
 	
@@ -308,44 +302,13 @@ public class ProbablisticBayesian extends Bayesian implements ClassifierAPI{
 			
 			variance += Math.pow( (-i) - (double)(mean), 2);  
 			
-		/*	if(dataset[i] == null)
-			{
-				variance += Math.pow( 0 - (double)(mean), 2);
-	
-			}
-			else 
-			{
-				variance += Math.pow( dataset[i].doubleValue() - (double)(mean), 2);
-	
-			}
-	*/
 		}	
 		variance = variance/ occurrences;
 			
 		return variance;
 	}
 	
-	
-	/*
-	 * Return the mean of a set data
-	 * */
-	public float getMean(){
-		return 0f;
-	}
-	
-	/*
-	 * Return the standard deviation of a set data
-	 * */
-	public float getSTD(){
-		return 0f;
-	}
-	
-	
-		public int calculateCount(){
-			
-			return 0;
-		}
-	
+
 
 
 

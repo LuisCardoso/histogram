@@ -5,9 +5,13 @@ import filter.AccessPointRSSIStrength;
 import filter.SelectionAverage;
 import filter.SelectionCoverage;
 import gui.DataTable;
+import histogram.AccessPoint;
 import histogram.Histogram;
 import histogram.TrainingData;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -16,10 +20,11 @@ import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.TreeMap;
 
+import table.Table;
 import Localizer.Bayesian;
 import Localizer.LaplaceBayesian;
 import Localizer.NaiveBayesian;
-import Localizer.ProbablisticBayesian;
+import Localizer.ProbabilisticBayesian;
 
 public class Main {
 
@@ -130,11 +135,6 @@ public class Main {
 	    // Set of training data. Each training data is associated to one access-point
 	    ArrayList<TrainingData> tds = new ArrayList<TrainingData>();
 	    
-	    // Selected access-point names by the user
-	    //ArrayList<String> names = new ArrayList<String>();
-
-	   // names = chosen_ap_names;
-	    
 	    // new training data
 	    TrainingData td;
 	    
@@ -172,26 +172,25 @@ public class Main {
 		 * ********************************************* */
 	      int current_cell = 0;
 	      int current_cell2 = 0;
+	      int current_cell3 = 0;
+		     
 	      
 	      //Naive Bayesian classifier
-	    /*  NaiveBayesian naiveBayesian = new NaiveBayesian(filepath); //create classifier 
+	      NaiveBayesian naiveBayesian = new NaiveBayesian(filepath); //create classifier 
 	      naiveBayesian.trainClassifier(tds); //train classifier 	   
 	      naiveBayesian.setInitialBelieve();    //set the initial believe to uniform
-	      */
-	    
-	 //     NaiveBayesian 
 	      
+	  
 	      /* Laplace classifier */
-		  /*LaplaceBayesian laplaceClassifier = new LaplaceBayesian(filepath);
+		  LaplaceBayesian laplaceClassifier = new LaplaceBayesian(filepath);
 		  laplaceClassifier.trainClassifier(tds); //train classifier by updating training data. correction done automatically 
 		  laplaceClassifier.setInitialBelieve();
-		    */  
+		      
 		  
 		  /* Probablistic classifier */
-		  ProbablisticBayesian probablisticClassifier = new ProbablisticBayesian(filepath);
-		  probablisticClassifier.trainClassifier(tds); //train classifier by updating training data. correction done automatically 
-		  probablisticClassifier.setInitialBelieve();
-		  
+		  ProbabilisticBayesian probabilisticClassifier = new ProbabilisticBayesian(filepath);
+		  probabilisticClassifier.trainClassifier(tds); //train classifier by updating training data. correction done automatically 
+		  probabilisticClassifier.setInitialBelieve();
 		  
 		  
 		  
@@ -200,27 +199,155 @@ public class Main {
 	      
 	      
 	      observations = oberserveNewRssi(keyboard,tds);  
-	     // current_cell=   naiveBayesian.classifyObservation(observations); 
-
-	 //     System.out.println("\n\nClassfication Type: Naive Bayesian");
-
-	      
-	   //   System.out.println("My location is Cell "+current_cell);
-	
-	     // System.out.println("\n\nClassfication Type: Laplace");
 	     
-	      //current_cell2 = laplaceClassifier.classifyObservation(observations);
-	      
+	      /* apply classification */
+	      current_cell=   naiveBayesian.classifyObservation(observations); 
+	      current_cell2 = laplaceClassifier.classifyObservation(observations);
+	      current_cell3 = probabilisticClassifier.classifyObservation(observations) ; 
 	      
 	      
 	      
 	      System.out.println("Results");
-	      System.out.println(" Bayesian => Cell: " + current_cell + "\n Laplace Cell:"+ current_cell2);
+	      System.out.println(" Determinisitc Bayesian => Cell: " + current_cell + "\n Laplace Cell:"+ current_cell2 + "\n Probablistic Bayesian Cell:"+ current_cell3);
+	 
+	      System.out.println("Classifer Distribution");
+	      
+	      ArrayList<Object> classiffierList = new  ArrayList<Object>(); 
+	      classiffierList.add(naiveBayesian);
+	      classiffierList.add(laplaceClassifier);
+	      classiffierList.add(probabilisticClassifier);
+	      
+	      saveTableToFile(naiveBayesian.tds, filepath,naiveBayesian,laplaceClassifier,probabilisticClassifier);
+	      
 	      
 	}
 	
 	
+	public static void printClassiferDistribution(Table classiferPMF){
+		
+		for(int i=classiferPMF.getTable().length-1; i>=0; i-- )
+		{
+			
+	//		System.out.println("["+i:"]: "+ classiferPMF.getTable());
+		}
+		
+	}
 	
+	
+	
+	/*
+	 * This writes the generated histogram to a file
+	 */
+	public static void saveTableToFile( ArrayList<TrainingData>tds, String base_path,  NaiveBayesian naiveBayesian,  LaplaceBayesian laplaceClassifier,   ProbabilisticBayesian probablisticClassifier ) {
+		try {
+			PrintWriter writer = null;
+			File file = null;
+			File basefile = new File(base_path);
+			String filename = null;
+			
+			
+			String format = " %1$2s , %2$10s , %3$30s , %4$30s";
+			String someLine;
+			String rssi_index;
+	
+			/*folder hierarchy 
+			 * 
+			 *  Classification/Results/
+			 *  Cell folders 
+			 *  file with AP name
+			 *  inside file each classifier probability against the rssi values
+			 *  */
+			
+			for(int c=0; c<17; c++)
+			{
+				// Create new directory for each cell
+				file = new File(
+						basefile.getParent()+
+						"/Results/Classification/c"+(c+1)+"/");
+				
+				// If the directory does not exist, then make one
+				if(!file.exists()) {
+					if(file.mkdirs())
+						System.out.println("Directory created!");
+					else
+						System.out.println("Failed to create directory!");
+				}
+			
+			
+				//create a new file for each AP
+				for(int t=0; t<tds.size(); t++)
+				{
+					filename = tds.get(t).getName();
+					
+					// Creates a new file in its corresponding directory
+							writer = new PrintWriter(
+										file.getPath()+
+										"/"+filename+
+										".txt"
+										);
+						
+					
+			        //put the header in the file 
+			     	writer.append("rssi: \t");	
+			     	
+			
+					writer.append(
+							naiveBayesian.getClassiferName()+", \t" +
+							laplaceClassifier.getClassiferName()+",\t" +
+							probablisticClassifier.getClassiferName()+"," );
+							
+			
+					writer.append("\n");
+							
+					
+					
+				for(int r=laplaceClassifier.tds.get(0).getPMF().getTable()[0].length-1; r>=0; r--)
+				//	for(int r=99; r>=0; r--)
+					{
+		/*				writer.append(
+							Float.toString(naiveBayesian.tds.get(t).getPMF().getValue(c,r))+": \t\t" +
+							Float.toString(laplaceClassifier.getPersonalTrainingData().get(t).getPMF().getValue(c,r))+": \t\t" +
+							Float.toString(probablisticClassifier.getPersonalTrainingData().get(t).getPMF().getValue(c,r))+": \n" 
+						);*/
+					 rssi_index= "["+r+"]: ";
+					 someLine = String.format(format, rssi_index, naiveBayesian.tds.get(t).getPMF().getValue(c,r), laplaceClassifier.getPersonalTrainingData().get(t).getPMF().getValue(c,r), probablisticClassifier.getPersonalTrainingData().get(t).getPMF().getValue(c,r));
+					   writer.append(someLine + "\n");
+					
+							
+					
+					
+					
+								
+					}
+					
+				writer.close();
+				
+				}//end of training data loops
+				
+				
+		
+			
+				
+			
+			
+			
+			
+			
+			
+			}//end of cell loop
+			
+			
+				
+		
+			
+		}
+		catch(FileNotFoundException fnfe) {
+			System.out.println("\n\nFile not found: \n\n"+ fnfe.getMessage());
+		}
+		catch(SecurityException se) {
+			System.out.println("\n\nSecurity: \n\n"+ se.getMessage());
+		}	
+	}
 	
 	
 	
@@ -296,7 +423,10 @@ public class Main {
 		
 	}
 	
-
+	/*
+	 *Get A list of new chosen Access-Points 
+	 *Selected by User via console.
+	 *  */
 	static public ArrayList<String>  getNewAccessPoints(Scanner keyboard, AccessPointRSSIStrength rssi_filter)
 	{
 		ArrayList<Integer> chosen_ap = new ArrayList<Integer>(); //save list of chosen access points
@@ -334,8 +464,6 @@ public class Main {
 			   chosen_ap.add(ap_number);
 			   id_scanner.close();
 		   }
-		   
-	//	   keyboard.close();
 
 		    System.out.println("number access points chosen:" + chosen_ap.size());
 		    System.out.println("Display of chosen access-points");
@@ -357,8 +485,6 @@ public class Main {
 		    	System.out.println("AP array name: "+chosen_ap_names.get(m));
 		    }
 		    
-		       
-
 		
 		return chosen_ap_names;
 	
